@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>恒星宇宙站 · 单星查看 / 多星同屏对比</title>
-  <meta name="description" content="在一个统一页面中探索 0.09、1.0、8、250 倍太阳质量恒星的完整演化，支持单星聚焦与多星同屏比较。" />
+  <title>恒星宇宙站 · 五星同屏 / 单星聚焦演化</title>
+  <meta name="description" content="在一个统一页面中探索 0.09、1.0、8、100、250 倍太阳质量恒星的完整演化，支持单星聚焦与五星同屏比较。" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="stylesheet" href="star-universe.css" />
 </head>
@@ -30,38 +30,23 @@
     </div>
   </div>
 
-  <main class="page-shell">
-    <header class="hero glass-panel">
+  <main class="page-shell one-screen-layout">
+    <header class="hero glass-panel compact-hero">
       <div class="hero-copy">
         <div class="hero-badge">STAR UNIVERSE · 统一宇宙站</div>
-        <h1>恒星的一生，终于放进同一个舞台里</h1>
+        <h1>五种恒星，同屏演化</h1>
         <p>
-          现在你可以<strong>单独看一颗星</strong>，也可以<strong>把四颗星同时放在一起</strong>，
-          用统一比例尺、统一视觉语言、统一控制系统，直接比较它们从诞生到终局的差异。
+          用统一比例尺和统一控制系统，直接比较 0.09、1.0、8、100、250 倍太阳质量恒星从诞生到终局的差异。
         </p>
       </div>
       <div class="hero-stats">
-        <div class="hero-stat"><span>最短寿命</span><strong>250 M☉</strong><em>约 300 万年</em></div>
+        <div class="hero-stat"><span>最快终局</span><strong>250 M☉</strong><em>约 300 万年 · PISN</em></div>
+        <div class="hero-stat"><span>黑洞结局</span><strong>100 M☉</strong><em>核心坍缩成黑洞</em></div>
         <div class="hero-stat"><span>最长寿命</span><strong>0.09 M☉</strong><em>约 3 万亿年</em></div>
-        <div class="hero-stat"><span>最壮烈结局</span><strong>PISN</strong><em>整颗恒星完全炸碎</em></div>
       </div>
     </header>
 
-    <section class="selector-wrap glass-panel">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">选择模式</p>
-          <h2>单独看，或者一起看</h2>
-        </div>
-        <div class="selector-actions">
-          <button id="selectAllBtn" class="mini-btn">全选</button>
-          <button id="showFocusBtn" class="mini-btn">只看焦点</button>
-        </div>
-      </div>
-      <div id="selectorGrid" class="selector-grid"></div>
-    </section>
-
-    <section class="control-wrap glass-panel">
+    <section class="control-wrap glass-panel sticky-control">
       <div class="control-row top">
         <button id="playBtn" class="action-btn primary">▶ 播放</button>
         <button id="resetBtn" class="action-btn ghost">↺ 重置</button>
@@ -75,6 +60,10 @@
             <option value="4">极速</option>
           </select>
         </label>
+        <div class="selector-actions inline-actions">
+          <button id="selectAllBtn" class="mini-btn">全选</button>
+          <button id="showFocusBtn" class="mini-btn">只看焦点</button>
+        </div>
       </div>
 
       <div class="progress-wrap">
@@ -87,42 +76,42 @@
       </div>
     </section>
 
-    <section class="insight-grid">
-      <article class="focus-card glass-panel">
-        <p class="eyebrow">当前焦点</p>
-        <div id="focusSummary"></div>
-      </article>
-      <article class="scale-card glass-panel">
-        <p class="eyebrow">统一比例尺标准</p>
-        <div class="scale-rules">
-          <div><strong>主序星</strong><span>中等可视尺寸，突出温度和光色差异</span></div>
-          <div><strong>巨星 / 超巨星</strong><span>统一放大，但避免遮挡画面</span></div>
-          <div><strong>白矮星 / 黑矮星</strong><span>统一压缩为小而亮 / 小而暗的终态</span></div>
-          <div><strong>超新星 / PISN</strong><span>特效爆发，但仍遵守同一视觉系统</span></div>
-        </div>
-      </article>
-    </section>
-
-    <section class="stage-wrap glass-panel">
+    <section class="stage-wrap glass-panel stage-fullscreen-friendly">
       <div class="section-head compact">
         <div>
           <p class="eyebrow">统一演化舞台</p>
-          <h2 id="stageTitle">四颗恒星同屏演化</h2>
+          <h2 id="stageTitle">五颗恒星同屏演化</h2>
         </div>
         <div id="selectionHint" class="selection-hint"></div>
       </div>
       <div id="stageGrid" class="stage-grid"></div>
     </section>
 
-    <section class="teach-wrap glass-panel">
-      <p class="eyebrow">教学解说</p>
-      <div class="teach-box">
-        <div id="teachEmoji" class="teach-emoji">🌌</div>
+    <section class="selector-wrap glass-panel selector-compact">
+      <div class="section-head compact">
         <div>
-          <h3 id="teachTitle">从分子云开始</h3>
-          <p id="teachCaption">选择一颗恒星作为焦点，点击播放，开始看它的一生。</p>
+          <p class="eyebrow">星种选择</p>
+          <h2>切换单星 / 多星比较</h2>
         </div>
       </div>
+      <div id="selectorGrid" class="selector-grid"></div>
+    </section>
+
+    <section class="insight-grid compact-insight">
+      <article class="focus-card glass-panel">
+        <p class="eyebrow">当前焦点</p>
+        <div id="focusSummary"></div>
+      </article>
+      <section class="teach-wrap glass-panel">
+        <p class="eyebrow">教学解说</p>
+        <div class="teach-box">
+          <div id="teachEmoji" class="teach-emoji">🌌</div>
+          <div>
+            <h3 id="teachTitle">从分子云开始</h3>
+            <p id="teachCaption">选择一颗恒星作为焦点，点击播放，开始看它的一生。</p>
+          </div>
+        </div>
+      </section>
     </section>
 
     <section id="quizPanel" class="quiz-wrap glass-panel hidden">

@@ -1,5 +1,171 @@
 // ============================================================
 //  star-250m-data.js
+//  100 M☉ / 250 M☉ 超大质量恒星演化数据
+// ============================================================
+
+const STAR_100M = {
+  key: "black-hole",
+  name: "超大质量恒星",
+  massLabel: "100 M☉",
+  massRatio: 100,
+  themeColor: "#7b8dff",
+  gradientFrom: "#b8c3ff",
+  gradientTo:   "#10081f",
+  summary: "质量达到太阳 100 倍，寿命极短，最终核心坍缩成黑洞，是『会留下残骸』的大质量恒星代表。",
+  funFact: "这类恒星可能在几百万年内就走完一生，最后留下一个事件视界，把一切光都锁在里面。",
+  fate: "🕳️ 黑洞",
+  fateColor: "#c8d2ff",
+
+  phases: [
+    {
+      key: "cloud",
+      name: "分子云坍缩",
+      ageStartMyr: 0, ageEndMyr: 0.06,
+      spanLabel: "0 ~ 6 万年",
+      state: "极速引力收缩",
+      lumLsun: 0.08, tempK: 4200, radiusRsun: 12,
+      color: "#aab8ff", halo: "rgba(130,150,255,0.42)",
+      note: "100 倍太阳质量让它一开始就拥有极强引力，气体云坍缩速度远快于太阳。",
+      teach: {
+        emoji: "🌌",
+        title: "诞生得飞快",
+        caption: "对这种超大质量恒星来说，『出生』几乎是一个暴力过程。引力极强，气体在极短时间里被拽向中心，点火倒计时非常快。"
+      }
+    },
+    {
+      key: "protostar",
+      name: "原恒星",
+      ageStartMyr: 0.06, ageEndMyr: 0.18,
+      spanLabel: "6 ~ 18 万年",
+      state: "预主序快速收缩",
+      lumLsun: 30000, tempK: 12000, radiusRsun: 7,
+      color: "#97a8ff", halo: "rgba(120,145,255,0.48)",
+      note: "还没正式点燃聚变，就已经亮得惊人，周围气体盘开始被强辐射吹散。",
+      teach: {
+        emoji: "⚡",
+        title: "青春期几乎不存在",
+        caption: "普通恒星会有一个相对漫长的原恒星阶段，但 100 M☉ 级别的恒星几乎是『刚成型就上场』。它太重了，根本不允许自己慢慢来。"
+      }
+    },
+    {
+      key: "zams",
+      name: "零龄主序点火",
+      ageStartMyr: 0.18, ageEndMyr: 0.4,
+      spanLabel: "18 ~ 40 万年",
+      state: "CNO 聚变全面启动",
+      lumLsun: 1200000, tempK: 42000, radiusRsun: 18,
+      color: "#8ea1ff", halo: "rgba(110,140,255,0.54)",
+      note: "核心启动极高效率的 CNO 循环，表面温度和亮度都远超普通主序星。",
+      teach: {
+        emoji: "🔥",
+        title: "真正的蓝白巨兽",
+        caption: "一旦点火，它就不再是『亮一点的太阳』，而是彻底不同层级的恒星：极蓝、极热、极亮，而且烧得非常狠。"
+      }
+    },
+    {
+      key: "o-supergiant",
+      name: "O 型超巨星",
+      ageStartMyr: 0.4, ageEndMyr: 2.2,
+      spanLabel: "40 万 ~ 220 万年",
+      state: "极端主序阶段",
+      lumLsun: 2200000, tempK: 45000, radiusRsun: 22,
+      color: "#7d93ff", halo: "rgba(100,130,255,0.5)",
+      note: "稳定期依旧非常短暂，恒星风猛烈地带走外层物质。",
+      teach: {
+        emoji: "💙",
+        title: "主序，但像开着推进器",
+        caption: "它也有主序阶段，但并不『稳定安静』。高亮度带来的辐射压会强烈驱动恒星风，让它一边燃烧，一边疯狂减重。"
+      }
+    },
+    {
+      key: "wolf-rayet",
+      name: "沃夫-拉叶星",
+      ageStartMyr: 2.2, ageEndMyr: 2.9,
+      spanLabel: "220 万 ~ 290 万年",
+      state: "外层被剥离，核心裸露",
+      lumLsun: 1800000, tempK: 90000, radiusRsun: 9,
+      color: "#9f86ff", halo: "rgba(168,110,255,0.5)",
+      note: "大量外层氢被吹走，暴露出更热、更致密的内核区域。",
+      teach: {
+        emoji: "☄️",
+        title: "把外衣都吹掉了",
+        caption: "这时候它看起来像是被『剥壳』的恒星：外层被恒星风持续吹掉，只剩炽热的核心区暴露在宇宙里。"
+      }
+    },
+    {
+      key: "collapse",
+      name: "核心坍缩前夕",
+      ageStartMyr: 2.9, ageEndMyr: 3.0,
+      spanLabel: "最后 10 万年",
+      state: "铁核形成，支撑失败",
+      lumLsun: 2800000, tempK: 180000, radiusRsun: 6,
+      color: "#c79bff", halo: "rgba(220,150,255,0.6)",
+      note: "核心最终走到铁元素，聚变不再产能，引力开始彻底接管。",
+      special: "critical",
+      teach: {
+        emoji: "⚠️",
+        title: "燃料烧到头了",
+        caption: "聚变像一个不断向上爬楼梯的过程，但铁是终点：再往后就不是释放能量，而是倒贴能量。到了这里，恒星已经没法靠核聚变撑住自己。"
+      }
+    },
+    {
+      key: "failed-sn",
+      name: "坍缩 / 失败超新星",
+      ageStartMyr: 3.0, ageEndMyr: 3.0001,
+      spanLabel: "几秒到几分钟",
+      state: "核心塌缩，外层回落",
+      lumLsun: 600000000, tempK: 1000000000, radiusRsun: 300000,
+      color: "#efe6ff", halo: "rgba(255,245,255,0.82)",
+      note: "可能伴随一次短暂但不彻底的爆发；更多物质最终回落，核心继续坍缩。",
+      special: "supernova",
+      teach: {
+        emoji: "💥",
+        title: "不是所有大质量恒星都能炸得漂亮",
+        caption: "对 100 M☉ 这种级别，核心坍缩后未必会形成『典型超新星』。很多模型认为它更可能发生失败超新星：亮一下，然后大部分物质又掉回去。"
+      }
+    },
+    {
+      key: "black-hole",
+      name: "黑洞",
+      ageStartMyr: 3.0001, ageEndMyr: 30,
+      spanLabel: "诞生后长期存在",
+      state: "事件视界形成",
+      lumLsun: 0.00000001, tempK: 0, radiusRsun: 0.0002,
+      color: "#05060c", halo: "rgba(110,130,255,0.18)",
+      note: "核心继续坍缩到连光也逃不出的程度，形成黑洞；周围可能存在炽热吸积盘。",
+      special: "blackhole",
+      teach: {
+        emoji: "🕳️",
+        title: "终局：黑洞",
+        caption: "这里不再是一颗会发光的恒星，而是一个事件视界。光、气体、甚至信息都会被它拖进更深的引力井里。舞台上剩下的亮环，是周围掉落物质最后的挣扎。"
+      }
+    }
+  ],
+
+  endingTitle: "终章：核心坍缩成黑洞",
+  endingDesc: "100 M☉ 恒星没有像 250 M☉ 那样完全炸碎，而是在核心坍缩后留下一个黑洞，成为真正的引力深井。",
+  endingBadge: "🕳️ 黑洞",
+  endingNote: "⚫ 黑洞不是『黑色的球』，而是一个连光都逃不出的区域。你看到的亮环通常来自吸积盘，而不是黑洞本体。",
+  quiz: [
+    {
+      q: "100 M☉ 恒星为什么会变成黑洞？",
+      a: "因为它在晚期形成高质量铁核后，聚变无法继续支撑引力，核心会不可逆坍缩，最终形成事件视界。",
+      ok: true, icon: "🕳️"
+    },
+    {
+      q: "黑洞会发光吗？",
+      a: "黑洞本体不发光；真正亮的是掉进黑洞前被加热到极高温的吸积盘物质。",
+      ok: false, icon: "💡"
+    },
+    {
+      q: "为什么 100 M☉ 和 250 M☉ 的结局不同？",
+      a: "250 M☉ 处在 PISN 质量窗口内，会被热核爆轰完全炸碎；100 M☉ 更典型的结局是核心坍缩并留下黑洞残骸。",
+      ok: true, icon: "⚖️"
+    }
+  ]
+};
+
+// ============================================================
 //  250 M☉ 极端大质量恒星演化数据
 //  结局：不稳定对超新星（Pair Instability Supernova, PISN）
 //  —— 完全炸碎，不留任何残骸！

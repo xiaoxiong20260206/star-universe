@@ -77,8 +77,10 @@ function classifyPhase(phase) {
   if (phase.special === "pulsar") return "compact";
   if (phase.special === "ultra-wd") return "white-dwarf";
   if (phase.special === "blackdwarf") return "black-dwarf";
+  if (phase.special === "blackhole") return "black-hole";
   if (key.includes("nebula") || key.includes("星云")) return "nebula";
   if (key.includes("white") || key.includes("白矮星")) return "white-dwarf";
+  if (key.includes("black-hole") || key.includes("black hole") || key.includes("黑洞")) return "black-hole";
   if (key.includes("black") || key.includes("黑矮星")) return "black-dwarf";
   if (key.includes("giant") || key.includes("巨星")) return key.includes("super") || key.includes("超巨") ? "supergiant" : "giant";
   if (key.includes("cloud") || key.includes("分子云")) return "cloud";
@@ -101,6 +103,7 @@ function getUnifiedVisualScale(star, phase) {
     "white-dwarf": 30,
     "black-dwarf": 20,
     compact: 18,
+    "black-hole": 28,
     critical: 86,
     supernova: 186,
     pisn: 208,
@@ -116,6 +119,7 @@ function getUnifiedVisualScale(star, phase) {
     "white-dwarf": 1.0,
     "black-dwarf": 1.0,
     compact: 1.0,
+    "black-hole": 1.0,
     critical: 1.0,
     supernova: 1.0,
     pisn: 1.0,
@@ -163,6 +167,8 @@ class UniverseStageCard {
           <div class="star-halo-outer"></div>
           <div class="star-halo"></div>
           <div class="star-core"></div>
+          <div class="black-hole-ring"></div>
+          <div class="black-hole-disk"></div>
           <div class="supernova-ring"></div>
           <div class="pisn-ring"></div>
           <div class="star-age"></div>
@@ -187,6 +193,8 @@ class UniverseStageCard {
     this.haloOuter = this.container.querySelector(".star-halo-outer");
     this.halo = this.container.querySelector(".star-halo");
     this.core = this.container.querySelector(".star-core");
+    this.blackHoleRing = this.container.querySelector(".black-hole-ring");
+    this.blackHoleDisk = this.container.querySelector(".black-hole-disk");
     this.supernovaRing = this.container.querySelector(".supernova-ring");
     this.pisnRing = this.container.querySelector(".pisn-ring");
     this.age = this.container.querySelector(".star-age");
@@ -252,9 +260,12 @@ class UniverseStageCard {
 
     this.visual.style.background = `radial-gradient(circle at 50% 115%, rgba(74,106,255,0.14), transparent 42%), radial-gradient(circle at 50% 45%, ${phase.halo.replace(/0?\.\d+\)/, "0.16)")}, transparent 58%), #030611`;
 
-    this.core.style.opacity = phaseClass === "black-dwarf" ? "0.42" : "1";
-    this.halo.style.opacity = phaseClass === "black-dwarf" ? "0.12" : phaseClass === "white-dwarf" ? "0.65" : phaseClass === "pisn" ? "1" : "0.78";
-    this.haloOuter.style.opacity = phaseClass === "pisn" ? "0.85" : phaseClass === "nebula" ? "0.45" : "0.32";
+    this.core.style.opacity = phaseClass === "black-dwarf" ? "0.42" : phaseClass === "black-hole" ? "1" : "1";
+    this.halo.style.opacity = phaseClass === "black-dwarf" ? "0.12" : phaseClass === "white-dwarf" ? "0.65" : phaseClass === "black-hole" ? "0.3" : phaseClass === "pisn" ? "1" : "0.78";
+    this.haloOuter.style.opacity = phaseClass === "pisn" ? "0.85" : phaseClass === "nebula" ? "0.45" : phaseClass === "black-hole" ? "0.42" : "0.32";
+
+    this.blackHoleRing.style.opacity = phaseClass === "black-hole" ? "1" : "0";
+    this.blackHoleDisk.style.opacity = phaseClass === "black-hole" ? "1" : "0";
 
     if (phaseClass === "white-dwarf") {
       this.core.style.background = `radial-gradient(circle at 35% 32%, #ffffff 0%, #e4f0ff 26%, ${color} 58%, #19345b 100%)`;
@@ -265,6 +276,14 @@ class UniverseStageCard {
     } else if (phaseClass === "compact") {
       this.core.style.background = `radial-gradient(circle at 35% 32%, #ffffff 0%, #9ce2ff 30%, #2458b8 64%, #041126 100%)`;
       this.core.style.boxShadow = `0 0 ${Math.round(size * 1.4)}px rgba(100,210,255,0.72)`;
+    } else if (phaseClass === "black-hole") {
+      this.core.style.background = `radial-gradient(circle at 50% 50%, #000000 0%, #03040a 58%, #090d18 100%)`;
+      this.core.style.boxShadow = `0 0 ${Math.round(size * 0.3)}px rgba(160,190,255,0.08), inset 0 0 ${Math.round(size * 0.5)}px rgba(255,255,255,0.02)`;
+      this.blackHoleDisk.style.width = `${Math.round(size * 3.5)}px`;
+      this.blackHoleDisk.style.height = `${Math.round(size * 1.2)}px`;
+      this.blackHoleDisk.style.boxShadow = `0 0 ${Math.round(size * 1.6)}px rgba(140,170,255,0.28)`;
+      this.blackHoleRing.style.width = `${Math.round(size * 1.6)}px`;
+      this.blackHoleRing.style.height = `${Math.round(size * 1.6)}px`;
     } else if (phaseClass === "pisn") {
       this.core.style.background = `radial-gradient(circle, #ffffff 0%, #fff3b0 22%, #ffb14d 55%, rgba(255,120,40,0.2) 82%, transparent 100%)`;
       this.core.style.boxShadow = `0 0 ${Math.round(size * 1.8)}px rgba(255,220,150,0.95), 0 0 ${Math.round(size * 3.4)}px rgba(255,160,70,0.42)`;
@@ -293,6 +312,11 @@ class UniverseStageCard {
     this.halo.style.background = `radial-gradient(circle, ${phase.halo} 0%, rgba(120,140,255,0.07) 58%, transparent 76%)`;
     this.haloOuter.style.background = `radial-gradient(circle, rgba(255,255,255,0.06) 0%, ${phase.halo.replace(/0?\.\d+\)/, "0.12)")} 48%, transparent 76%)`;
 
+    if (phaseClass !== "black-hole") {
+      this.blackHoleDisk.style.width = "0px";
+      this.blackHoleDisk.style.height = "0px";
+    }
+
     this._lastPhaseIdx = idx;
 
     return { star: this.star, phase, age, idx, phaseClass };
@@ -301,8 +325,8 @@ class UniverseStageCard {
 
 class StarUniverseApp {
   constructor() {
-    this.catalog = [...STAR_CATALOG, STAR_250M];
-    this.selected = new Set(["red-dwarf", "sun", "massive", "extreme"]);
+    this.catalog = [...STAR_CATALOG, STAR_100M, STAR_250M];
+    this.selected = new Set(["red-dwarf", "sun", "massive", "black-hole", "extreme"]);
     this.focusKey = "sun";
     this.progress = 0;
     this.speed = 1;
@@ -397,7 +421,19 @@ class StarUniverseApp {
 
   renderStage() {
     const selectedStars = this.getSelectedStars();
-    const columns = selectedStars.length === 1 ? 1 : selectedStars.length === 2 ? 2 : 2;
+    const width = window.innerWidth;
+    let columns = 1;
+
+    if (selectedStars.length === 1) {
+      columns = 1;
+    } else if (width >= 640) {
+      columns = selectedStars.length;
+    } else if (width >= 520) {
+      columns = Math.min(selectedStars.length, 3);
+    } else {
+      columns = Math.min(selectedStars.length, 2);
+    }
+
     this.stageGrid.style.gridTemplateColumns = `repeat(${columns}, minmax(0, 1fr))`;
 
     const currentKeys = new Set(selectedStars.map((item) => item.key));
@@ -590,12 +626,17 @@ class StarUniverseApp {
       this.endingClose.addEventListener("click", () => this.hideEnding());
     }
 
+    window.addEventListener("resize", () => {
+      this.renderStage();
+      this.render();
+    });
+
     setInterval(() => {
       const focusCard = this.cards.get(this.focusKey);
       const phase = focusCard?.star.phases[getPhaseIndex(focusCard.ranges, this.progress)];
       if (!phase) return;
       const phaseClass = classifyPhase(phase);
-      if (["pisn", "supernova", "critical", "compact", "white-dwarf"].includes(phaseClass)) {
+      if (["pisn", "supernova", "critical", "compact", "white-dwarf", "black-hole"].includes(phaseClass)) {
         this.render();
       }
     }, 80);
@@ -614,6 +655,9 @@ class StarUniverseApp {
       if (star.key === this.focusKey) focusResult = result;
       if (result.phase.special === "pisn" || result.phase.special === "supernova") {
         this.triggerFlash(result.phase.special === "pisn" ? "pisn" : "sn");
+      }
+      if (result.phase.special === "blackhole") {
+        this.triggerFlash("sn");
       }
     });
 
