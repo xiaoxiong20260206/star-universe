@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>250 M☉ 极端大质量恒星 · 不稳定对超新星</title>
+  <link rel="stylesheet" href="star-compare.css" />
+  <style>
+    /* ===== 250M 专属样式 ===== */
+    :root {
+      --theme: #ff3366;
+      --theme2: #ff6699;
+    }
+
+    .hero-badge-250 {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(255,50,100,0.25), rgba(255,100,150,0.15));
+      border: 1px solid rgba(255,80,120,0.4);
+      font-size: 13px;
+      color: #ffaabb;
+      margin-bottom: 14px;
+      letter-spacing: 0.5px;
+    }
+
+    .hero-250 {
+      padding: 36px 0 28px;
+      margin-bottom: 24px;
+    }
+
+    .hero-250 h1 {
+      font-size: clamp(28px, 5vw, 46px);
+      font-weight: 900;
+      background: linear-gradient(135deg, #ff8899, #ffddaa, #ff4466);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 8px 0 14px;
+      line-height: 1.15;
+    }
+
+    .hero-250 .sub {
+      font-size: 16px;
+      color: #b0a8cc;
+      line-height: 1.7;
+      max-width: 680px;
+    }
+
+    .hero-250 .sub strong { color: #ffccaa; }
+
+    .warn-box {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 14px 18px;
+      background: rgba(255,60,60,0.1);
+      border: 1px solid rgba(255,100,100,0.3);
+      border-radius: 14px;
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: #ffbbbb;
+      line-height: 1.6;
+    }
+    .warn-box .wi { font-size: 22px; flex-shrink: 0; }
+
+    /* PISN 爆炸闪光 */
+    .pisn-flash {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle, rgba(255,255,230,0.85) 0%, rgba(255,200,100,0.5) 35%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 600;
+    }
+
+    /* PISN 粒子容器 */
+    .pisn-particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .pisn-particle {
+      position: absolute;
+      border-radius: 50%;
+      animation: pisn-fly var(--dur, 1.2s) ease-out forwards;
+    }
+
+    @keyframes pisn-fly {
+      from { transform: translate(0,0) scale(1); opacity: 1; }
+      to   { transform: translate(var(--tx), var(--ty)) scale(0.2); opacity: 0; }
+    }
+
+    /* 警告脉冲（pre-pisn 阶段）*/
+    @keyframes danger-pulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(255,100,50,0.6), 0 0 60px rgba(255,50,50,0.3); }
+      50%       { box-shadow: 0 0 60px rgba(255,150,50,1),   0 0 120px rgba(255,80,50,0.6); }
+    }
+    .star-danger { animation: danger-pulse 0.6s ease-in-out infinite; }
+
+    /* 遗迹星云闪烁 */
+    @keyframes nebula-shimmer {
+      0%, 100% { opacity: 0.7; filter: hue-rotate(0deg); }
+      33%  { opacity: 1;   filter: hue-rotate(15deg); }
+      66%  { opacity: 0.8; filter: hue-rotate(-10deg); }
+    }
+    .star-nebula { animation: nebula-shimmer 2s ease-in-out infinite; }
+
+    /* 科学卡片 */
+    .science-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin: 24px 0;
+    }
+
+    .sci-card {
+      background: rgba(20, 10, 30, 0.6);
+      border: 1px solid rgba(255, 60, 100, 0.2);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .sci-card .sci-icon { font-size: 26px; margin-bottom: 8px; }
+    .sci-card .sci-title { font-size: 12px; color: #ff9ab0; font-weight: 700; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .sci-card .sci-value { font-size: 20px; font-weight: 800; color: #ffe0ee; }
+    .sci-card .sci-note  { font-size: 11px; color: #8899bb; margin-top: 4px; line-height: 1.4; }
+
+    /* 单星展示区 */
+    .solo-star-section {
+      display: flex;
+      justify-content: center;
+      margin: 10px 0 20px;
+    }
+
+    .solo-star-section .stars-grid {
+      width: 100%;
+      max-width: 480px;
+    }
+
+    /* 分类路径图 */
+    .pisn-path-section {
+      margin: 24px 0;
+    }
+
+    .pisn-path-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ff9abb;
+      margin-bottom: 12px;
+    }
+
+    .pisn-path-timeline {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .ppt-step {
+      flex: 1;
+      min-width: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .ppt-step:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      right: -10px;
+      top: 20px;
+      color: rgba(255,100,150,0.5);
+      font-size: 16px;
+      z-index: 1;
+    }
+
+    .ppt-icon {
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .ppt-name {
+      font-size: 11px;
+      color: #cc8899;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .ppt-age {
+      font-size: 10px;
+      color: rgba(180,140,160,0.6);
+      text-align: center;
+      margin-top: 3px;
+    }
+
+    .ppt-step.highlight .ppt-icon {
+      animation: danger-pulse 0.8s ease-in-out infinite;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PISN 闪光层 -->
+  <div id="pisnFlash" class="pisn-flash"></div>
+  <!-- 普通超新星闪光备用 -->
+  <div id="snFlash" class="sn-flash-overlay"></div>
+
+  <!-- 结局弹层 -->
+  <div id="endingOverlay" class="ending-overlay">
+    <div class="ending-card">
+      <div class="ending-glow" style="background:radial-gradient(circle at 50% 30%, rgba(255,80,60,0.3), transparent 60%)"></div>
+      <p class="ending-pre">🎬 演化终章</p>
+      <h2 class="ending-title">终章</h2>
+      <p class="ending-desc"></p>
+      <div class="ending-badge" style="font-size:28px;margin:12px 0"></div>
+      <p class="ending-note hidden" id="endingNote"></p>
+      <div class="ending-facts">
+        <div class="ef-item">⚡ PISN 能量：普通超新星的 100 倍</div>
+        <div class="ef-item">🌌 亮度：比整个银河系还亮数十倍</div>
+        <div class="ef-item">🔬 残骸：零——完全湮灭，不留中子星或黑洞</div>
+        <div class="ef-item">🌱 遗产：大量铁、镍等重元素播撒到宇宙</div>
+      </div>
+      <button id="endingClose" class="ending-btn" style="background:linear-gradient(135deg,#aa2040,#ff4466)">↺ 继续探索</button>
+    </div>
+  </div>
+
+  <main class="app-page">
+
+    <!-- HERO -->
+    <header class="hero-250">
+      <div class="hero-badge-250">🔴 极端大质量恒星 · 250 M☉</div>
+      <h1>最壮烈的死亡<br/>不稳定对超新星</h1>
+      <p class="sub">
+        质量是太阳 250 倍，只活 <strong>300 万年</strong>，比侏罗纪还短。<br/>
+        它的死亡方式是宇宙中最极端的核爆炸——<strong>不稳定对超新星（PISN）</strong>，<br/>
+        整颗恒星被完全炸碎，连中子星和黑洞都不会留下。
+      </p>
+    </header>
+
+    <!-- 警告框 -->
+    <div class="warn-box">
+      <span class="wi">⚡</span>
+      <span>
+        <strong>注意：这颗恒星的质量处于「对不稳定」区间（140–260 M☉）。</strong>
+        &lt;140 M☉ 的恒星会留下黑洞；&gt;260 M☉ 的恒星可能直接坍缩成黑洞跳过PISN。
+        250 M☉ 处于完全炸碎的甜蜜区间——不留任何残骸。
+      </span>
+    </div>
+
+    <!-- 科学参数卡片 -->
+    <div class="science-cards">
+      <div class="sci-card">
+        <div class="sci-icon">⚖️</div>
+        <div class="sci-title">质量</div>
+        <div class="sci-value">250 M☉</div>
+        <div class="sci-note">相当于 25 万个地球</div>
+      </div>
+      <div class="sci-card">
+        <div class="sci-icon">⏳</div>
+        <div class="sci-title">寿命</div>
+        <div class="sci-value">~300 万年</div>
+        <div class="sci-note">比侏罗纪末期（6600万年前）短 20 倍</div>
+      </div>
+      <div class="sci-card">
+        <div class="sci-icon">💡</div>
+        <div class="sci-title">最高光度</div>
+        <div class="sci-value">500 万 L☉</div>
+        <div class="sci-note">PISN 爆炸峰值超过 1000 亿 L☉</div>
+      </div>
+      <div class="sci-card">
+        <div class="sci-icon">🔥</div>
+        <div class="sci-title">表面温度</div>
+        <div class="sci-value">52,000 K</div>
+        <div class="sci-note">是太阳表面温度的 9 倍</div>
+      </div>
+      <div class="sci-card">
+        <div class="sci-icon">🎯</div>
+        <div class="sci-title">残骸</div>
+        <div class="sci-value">零</div>
+        <div class="sci-note">PISN 完全摧毁恒星，无中子星无黑洞</div>
+      </div>
+      <div class="sci-card">
+        <div class="sci-icon">💣</div>
+        <div class="sci-title">爆炸能量</div>
+        <div class="sci-value">100× 普通超新星</div>
+        <div class="sci-note">释放约 10⁴⁵ 焦耳的爆炸能量</div>
+      </div>
+    </div>
+
+    <!-- 演化路径时间轴 -->
+    <div class="pisn-path-section">
+      <div class="pisn-path-title">📍 演化路径总览</div>
+      <div class="pisn-path-timeline">
+        <div class="ppt-step"><div class="ppt-icon">☁️</div><div class="ppt-name">分子云</div><div class="ppt-age">0</div></div>
+        <div class="ppt-step"><div class="ppt-icon">🔶</div><div class="ppt-name">原恒星</div><div class="ppt-age">5 万年</div></div>
+        <div class="ppt-step"><div class="ppt-icon">🔵</div><div class="ppt-name">O 型超巨星</div><div class="ppt-age">30 万年</div></div>
+        <div class="ppt-step"><div class="ppt-icon">🌪️</div><div class="ppt-name">亮蓝变星</div><div class="ppt-age">150 万年</div></div>
+        <div class="ppt-step"><div class="ppt-icon">☄️</div><div class="ppt-name">沃夫-拉叶</div><div class="ppt-age">200 万年</div></div>
+        <div class="ppt-step highlight"><div class="ppt-icon">⚠️</div><div class="ppt-name">对不稳定前夕</div><div class="ppt-age">280 万年</div></div>
+        <div class="ppt-step highlight"><div class="ppt-icon">💥</div><div class="ppt-name">PISN 爆炸</div><div class="ppt-age">290 万年</div></div>
+        <div class="ppt-step"><div class="ppt-icon">🌈</div><div class="ppt-name">遗迹星云</div><div class="ppt-age">永久扩散</div></div>
+      </div>
+    </div>
+
+    <!-- 控制栏 -->
+    <div class="control-bar">
+      <button id="playBtn" class="ctrl-btn primary">▶ 播放</button>
+      <button id="resetBtn" class="ctrl-btn ghost">↺ 重置</button>
+      <label class="ctrl-label">
+        速度
+        <select id="speedSelect" class="ctrl-select">
+          <option value="0.4">慢速</option>
+          <option value="1" selected>标准</option>
+          <option value="2">快速</option>
+          <option value="4">极速</option>
+        </select>
+      </label>
+      <button id="teachToggle" class="ctrl-btn mode active">🎓 教学解说</button>
+      <button id="quizToggle"  class="ctrl-btn mode">🧩 趣味问答</button>
+    </div>
+
+    <!-- 进度条 -->
+    <div class="progress-section">
+      <div class="progress-track" id="progressTrack">
+        <div class="progress-rail">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-thumb" id="progressThumb"></div>
+        <input type="range" id="progressBar" min="0" max="1000" value="0" class="progress-input" />
+        <div class="milestone-bar" id="milestoneBar"></div>
+      </div>
+      <div class="stage-label" id="stageLabel">进度 0% · 分子云坍缩</div>
+    </div>
+
+    <!-- 教学解说栏 -->
+    <div id="teachBar" class="teach-bar">
+      <div class="teach-emoji" id="teachEmoji">🌌</div>
+      <div class="teach-content">
+        <strong id="teachTitle">极端大质量恒星的诞生</strong>
+        <p id="teachCaption">点击播放，见证宇宙中最极端的恒星演化！</p>
+      </div>
+    </div>
+
+    <!-- 星体展示区（单星） -->
+    <div class="solo-star-section">
+      <div class="stars-grid" id="starsGrid"></div>
+    </div>
+
+    <!-- 问答面板 -->
+    <section class="quiz-section hidden" id="quizPanel">
+      <div id="quizSection"></div>
+    </section>
+
+    <footer class="app-footer">
+      📚 不稳定对超新星（PISN）理论由 Rakavy & Shaviv（1967）提出，适用于 140–260 M☉ 的恒星。<br/>
+      宇宙第一代恒星（Pop III）可能大量经历 PISN，是早期宇宙重元素的主要来源之一。
+    </footer>
+
+  </main>
+
+  <script src="star-250m-data.js"></script>
+  <script src="star-250m-engine.js"></script>
+</body>
+</html>

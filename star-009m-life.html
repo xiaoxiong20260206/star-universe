@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>0.09太阳质量恒星的一生</title>
+  <link rel="stylesheet" href="star-009m-life.css" />
+</head>
+<body>
+  <!-- ========== ENDING OVERLAY ========== -->
+  <div id="endingOverlay" class="ending-overlay">
+    <div class="ending-card">
+      <div class="ending-icon">🌑</div>
+      <h2 class="ending-title">终章：黑矮星</h2>
+      <p class="ending-subtitle">这颗恒星完成了它的一生</p>
+      <div class="ending-body">
+        <p>
+          它没有爆炸，没有超新星闪光，没有黑洞。<br/>
+          它只是慢慢地、安静地，从一团气体，燃烧了将近 <strong>3 万亿年</strong>，
+          最终变成一块冰冷、致密、沉默的氦球，
+          漂浮在几乎空无一物的宇宙深处。
+        </p>
+        <div class="ending-compare">
+          <div class="ec-item">
+            <div class="ec-label">🔴 0.09 M☉ 红矮星</div>
+            <div class="ec-val">寿命 <strong>~3 万亿年</strong></div>
+            <div class="ec-result">🌑 黑矮星（氦核）</div>
+          </div>
+          <div class="ec-vs">VS</div>
+          <div class="ec-item sun">
+            <div class="ec-label">☀️ 1.0 M☉ 太阳</div>
+            <div class="ec-val">寿命 <strong>~100 亿年</strong></div>
+            <div class="ec-result">💫 行星状星云 → 白矮星</div>
+          </div>
+        </div>
+        <p class="ending-footnote">
+          ⚠️ 注：目前宇宙年龄约 138 亿年，距离任何恒星变成黑矮星还需要数千亿倍的时间。
+          黑矮星是理论预测的终态，迄今宇宙中不存在任何一颗。
+        </p>
+      </div>
+      <button id="endingClose" class="ending-btn">↺ 返回时间轴</button>
+    </div>
+  </div>
+
+  <main class="life-page">
+    <header class="hero">
+      <p class="hero-badge">恒星演化可视化</p>
+      <h1>0.09 太阳质量恒星的一生</h1>
+      <p class="hero-desc">
+        这是一颗刚好越过氢聚变阈值的超低质量红矮星。
+        拖动时间轴或点击播放，从诞生看到最终的黑矮星结局。
+      </p>
+      <div class="mode-toggles">
+        <button id="teachBtn" class="mode-btn active" title="开启教学模式，每个阶段自动显示讲解字幕">
+          🎓 教学模式
+        </button>
+        <button id="compareBtn" class="mode-btn" title="开启太阳对比，左边是0.09M☉恒星，右边是太阳">
+          ☀️ 太阳对比
+        </button>
+      </div>
+    </header>
+
+    <!-- Teaching caption bar -->
+    <div id="teachBar" class="teach-bar">
+      <div class="teach-icon" id="teachEmoji">🔭</div>
+      <div class="teach-text">
+        <strong id="teachTitle">分子云核心阶段</strong>
+        <p id="teachCaption">
+          想象一大团气体和尘埃，在引力的作用下慢慢向中心聚拢，核心越来越热，就像捏紧一个气球会变热一样。
+        </p>
+      </div>
+    </div>
+
+    <section class="sim-layout" id="simLayout">
+
+      <!-- ======== STAR SCENE ======== -->
+      <div class="space-card">
+        <div class="scenes-row" id="scenesRow">
+
+          <!-- 0.09 M☉ star -->
+          <div class="star-scene-wrap">
+            <div class="scene-label">0.09 M☉ 红矮星</div>
+            <div class="space-scene" id="spaceScene">
+              <div class="star-halo" id="starHalo"></div>
+              <div class="star-core" id="starCore"></div>
+              <div class="age-tag" id="ageTag">年龄：0 Myr</div>
+            </div>
+          </div>
+
+          <!-- Sun comparison (hidden by default) -->
+          <div class="star-scene-wrap" id="sunWrap" style="display:none">
+            <div class="scene-label sun-label">1.0 M☉ 太阳</div>
+            <div class="space-scene space-scene-sun" id="sunScene">
+              <div class="star-halo" id="sunHalo"></div>
+              <div class="star-core" id="sunCore"></div>
+              <div class="age-tag" id="sunAgeTag">年龄：0 Myr</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Comparison panel -->
+        <div id="comparePanel" class="compare-panel" style="display:none">
+          <div class="compare-col">
+            <div class="compare-head">🔴 0.09 M☉ 红矮星</div>
+            <div class="compare-body" id="compareRedDwarf"></div>
+          </div>
+          <div class="compare-divider"></div>
+          <div class="compare-col">
+            <div class="compare-head sun-head">☀️ 1.0 M☉ 太阳</div>
+            <div class="compare-body" id="compareSun"></div>
+          </div>
+        </div>
+
+        <div class="timeline-wrap">
+          <div class="timeline-header">
+            <h2 id="stageTitle">分子云核心</h2>
+            <span id="stageSpan">0 — 1 百万年</span>
+          </div>
+          <input id="progress" type="range" min="0" max="1000" value="0" />
+          <div class="timeline-stops" id="timelineStops"></div>
+        </div>
+      </div>
+
+      <!-- ======== INFO PANEL ======== -->
+      <aside class="info-card">
+        <h3>实时参数</h3>
+        <ul class="metrics">
+          <li><span>恒星质量</span><strong>0.09 M☉</strong></li>
+          <li><span>年龄</span><strong id="metricAge">0 Myr</strong></li>
+          <li><span>光度</span><strong id="metricLum">0.001 L☉</strong></li>
+          <li><span>表面温度</span><strong id="metricTemp">2400 K</strong></li>
+          <li><span>半径</span><strong id="metricRadius">0.85 R☉</strong></li>
+          <li><span>主导状态</span><strong id="metricState">引力收缩</strong></li>
+        </ul>
+
+        <div class="stage-note">
+          <h4>阶段解读</h4>
+          <p id="stageNote">
+            气体和尘埃在引力作用下坍缩，温度上升但尚未触发稳定核聚变。
+          </p>
+        </div>
+
+        <!-- 演化路径摘要 -->
+        <div class="path-summary">
+          <h4>演化路径</h4>
+          <div class="path-steps">
+            <span>☁️ 分子云</span>
+            <span class="arrow">→</span>
+            <span>🔶 原恒星</span>
+            <span class="arrow">→</span>
+            <span>⚡ 红矮星</span>
+            <span class="arrow">→</span>
+            <span>💜 白矮星</span>
+            <span class="arrow">→</span>
+            <span>🌑 黑矮星</span>
+          </div>
+          <p class="path-note">不经历红巨星 · 不爆炸 · 永恒沉默</p>
+        </div>
+
+        <div class="controls">
+          <button id="playBtn">▶ 播放</button>
+          <button id="resetBtn" class="ghost">↺ 重置</button>
+          <label class="speed-select">
+            速度
+            <select id="speedSelect">
+              <option value="0.5">慢速</option>
+              <option value="1" selected>标准</option>
+              <option value="2">快速</option>
+              <option value="4">极快</option>
+            </select>
+          </label>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="footnote">
+      📚 科学注释：0.09 M☉ 恒星不经历红巨星膨胀或超新星爆炸，其演化终态为氦白矮星，
+      并理论上最终冷却成黑矮星（宇宙目前年龄尚不足以产生任何黑矮星）。
+      太阳（1.0 M☉）寿命约 100 亿年，经历红巨星→行星状星云→白矮星路径。
+    </footer>
+  </main>
+
+  <script src="star-009m-life.js"></script>
+</body>
+</html>

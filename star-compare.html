@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>恒星的一生 · 宇宙探索</title>
+  <link rel="stylesheet" href="star-compare.css" />
+</head>
+<body>
+
+  <!-- ===== 超新星闪光层 ===== -->
+  <div id="snFlash" class="sn-flash-overlay"></div>
+
+  <!-- ===== 结局弹层 ===== -->
+  <div id="endingOverlay" class="ending-overlay">
+    <div class="ending-card">
+      <div class="ending-glow"></div>
+      <p class="ending-pre">🎬 演化终章</p>
+      <h2 class="ending-title">终章</h2>
+      <p class="ending-desc"></p>
+      <div class="ending-badge" style="font-size:28px;margin:12px 0"></div>
+      <p class="ending-note hidden" id="endingNote"></p>
+      <div class="ending-facts">
+        <div class="ef-item">🔴 0.09 M☉ 红矮星 → 🌑 黑矮星（3万亿年后）</div>
+        <div class="ef-item">☀️ 1.0 M☉ 太阳 → 💙 白矮星（约115亿年）</div>
+        <div class="ef-item">🔵 8 M☉ 大质量 → 💥 超新星 → 中子星（约95亿年）</div>
+      </div>
+      <button id="endingClose" class="ending-btn">↺ 继续探索</button>
+    </div>
+  </div>
+
+  <!-- ===== MAIN ===== -->
+  <main class="app-page">
+
+    <!-- ===== HERO ===== -->
+    <header class="hero">
+      <div class="hero-inner">
+        <div class="hero-text">
+          <p class="hero-badge">🌌 宇宙探索 · 恒星演化可视化</p>
+          <h1>恒星的一生</h1>
+          <p class="hero-desc">
+            选择你想探索的恒星，看它从一团气体，走过亿万年岁月，走向各自的命运。<br/>
+            <strong>你身体里的每一个铁原子，都来自一颗死去的恒星。</strong>
+          </p>
+        </div>
+        <div class="hero-stats">
+          <div class="hs-item"><span>最短寿命</span><strong>~3000 万年</strong><em>8 M☉ 大质量</em></div>
+          <div class="hs-sep"></div>
+          <div class="hs-item"><span>最长寿命</span><strong>~3 万亿年</strong><em>红矮星</em></div>
+          <div class="hs-sep"></div>
+          <div class="hs-item"><span>最壮烈结局</span><strong>超新星爆炸</strong><em>一秒，比银河系还亮</em></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== 星种选择器 ===== -->
+    <section class="selector-section">
+      <h2 class="section-title">选择恒星 <span class="hint">（可多选对比）</span></h2>
+      <div class="star-selector" id="starSelector">
+        <!-- JS 填充 -->
+      </div>
+    </section>
+
+    <!-- ===== 控制栏 ===== -->
+    <div class="control-bar">
+      <button id="playBtn" class="ctrl-btn primary">▶ 播放</button>
+      <button id="resetBtn" class="ctrl-btn ghost">↺ 重置</button>
+      <label class="ctrl-label">
+        速度
+        <select id="speedSelect" class="ctrl-select">
+          <option value="0.4">慢速</option>
+          <option value="1" selected>标准</option>
+          <option value="2">快速</option>
+          <option value="4">极速</option>
+        </select>
+      </label>
+      <button id="teachToggle" class="ctrl-btn mode active">🎓 教学解说</button>
+      <button id="quizToggle"  class="ctrl-btn mode">🧩 趣味问答</button>
+    </div>
+
+    <!-- ===== 进度条 ===== -->
+    <div class="progress-section">
+      <div class="progress-track" id="progressTrack">
+        <div class="progress-rail">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-thumb" id="progressThumb"></div>
+        <input type="range" id="progressBar" min="0" max="1000" value="0" class="progress-input" />
+        <div class="milestone-bar" id="milestoneBar"></div>
+      </div>
+      <div class="stage-label" id="stageLabel">进度 0% · 分子云</div>
+    </div>
+
+    <!-- ===== 教学解说栏 ===== -->
+    <div id="teachBar" class="teach-bar">
+      <div class="teach-emoji" id="teachEmoji">🌌</div>
+      <div class="teach-content">
+        <strong id="teachTitle">分子云核心阶段</strong>
+        <p id="teachCaption">选择恒星并点击播放，开始探索恒星的一生！</p>
+      </div>
+    </div>
+
+    <!-- ===== 星体展示区 ===== -->
+    <section class="stars-section">
+      <div class="stars-grid" id="starsGrid">
+        <!-- StarWidget 动态插入 -->
+      </div>
+    </section>
+
+    <!-- ===== 问答面板 ===== -->
+    <section class="quiz-section hidden" id="quizPanel">
+      <div id="quizSection"></div>
+    </section>
+
+    <!-- ===== 演化路径对比 ===== -->
+    <section class="path-section">
+      <h2 class="section-title">三条命运之路</h2>
+      <div class="path-cards">
+        <div class="path-card red">
+          <div class="pc-mass">0.09 M☉</div>
+          <div class="pc-name">超低质量红矮星</div>
+          <div class="pc-path">
+            ☁️ 分子云 → 🔶 原恒星 <em>（8000 万年）</em><br/>
+            → 🔴 红矮星主序 <em>（500 亿年）</em><br/>
+            → 💜 氦白矮星 → 🌑 黑矮星
+          </div>
+          <div class="pc-note">❌ 不爆炸 · 不膨胀成红巨星 · 平静永恒</div>
+        </div>
+        <div class="path-card sun">
+          <div class="pc-mass">1.0 M☉</div>
+          <div class="pc-name">太阳型恒星</div>
+          <div class="pc-path">
+            ☁️ 分子云 → 🔶 原恒星 <em>（4000 万年）</em><br/>
+            → ☀️ 主序 <em>（100 亿年）</em><br/>
+            → 🔴 红巨星 → 💫 行星状星云 → 💙 白矮星
+          </div>
+          <div class="pc-note">⚠️ 红巨星会吞噬地球 · 华丽谢幕</div>
+        </div>
+        <div class="path-card blue">
+          <div class="pc-mass">8 M☉</div>
+          <div class="pc-name">大质量恒星（临界线）</div>
+          <div class="pc-path">
+            ☁️ 分子云 → 🔷 原恒星 <em>（30 万年！）</em><br/>
+            → 💙 蓝超巨星 → 🔴 红超巨星<br/>
+            → 🌪️ 超级AGB → 💫 巨型星云<br/>
+            → 💎 超大质量白矮星 → 🌑 黑矮星
+          </div>
+          <div class="pc-note">⚡ 没有超新星！留下最重、最危险的黑矮星</div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="app-footer">
+      📚 数据基于天文物理模型近似。实际恒星演化受金属丰度、双星效应等多种因素影响。<br/>
+      铁等重元素由超新星合成并散播到宇宙 — 你身体里的每个铁原子都来自一颗死去的大质量恒星。
+    </footer>
+
+  </main>
+
+  <script src="star-data.js"></script>
+  <script src="star-engine.js"></script>
+</body>
+</html>
