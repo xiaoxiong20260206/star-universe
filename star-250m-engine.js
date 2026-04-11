@@ -1,5 +1,5 @@
 // ============================================================
-//  star-250m-engine.js
+//  star-250m-engine.js  v2 — 全面优化视觉渲染
 //  250 M☉ 单星展示引擎（含 PISN 爆炸特效）
 // ============================================================
 
@@ -24,10 +24,24 @@ function formatLum250(l) {
   return l.toFixed(2);
 }
 
-// 构建等宽进度区间（每阶段至少 5% 进度）
+// 可见尺寸映射：每个阶段手动指定视觉大小（px），不依赖真实半径比例
+// 这样每个阶段都能清晰可见
+const PHASE_VISUAL_SIZE = {
+  "cloud":       52,
+  "protostar":   60,
+  "zams":        90,
+  "o-supergiant":100,
+  "lbv":         130,
+  "wolf-rayet":   72,
+  "pre-pisn":     80,
+  "pisn":        200,   // 会动态扩大
+  "pisn-nebula": 170,
+};
+
+// 构建等宽进度区间（每阶段至少 6% 进度）
 function buildRanges250(phases) {
-  const total = phases.length;
-  const minSpan = Math.floor(MAX_PROGRESS_250 * 0.05);
+  const total   = phases.length;
+  const minSpan = Math.floor(MAX_PROGRESS_250 * 0.06);
   const reserved = minSpan * total;
   const remaining = MAX_PROGRESS_250 - reserved;
   const ageSpans = phases.map(p => Math.max(p.ageEndMyr - p.ageStartMyr, 0.0001));
@@ -36,7 +50,7 @@ function buildRanges250(phases) {
   return phases.map((p, i) => {
     const span = minSpan + Math.round((ageSpans[i] / totalAge) * remaining);
     const start = cur;
-    const end = cur + span;
+    const end   = cur + span;
     cur = end;
     return { start, end };
   });
@@ -50,7 +64,7 @@ function getPhaseIdx250(ranges, progress) {
 }
 
 // ============================================================
-// StarWidget250 — 单颗星渲染
+// StarWidget250 — 单颗星渲染（全面视觉优化版）
 // ============================================================
 class StarWidget250 {
   constructor(container) {
@@ -64,40 +78,54 @@ class StarWidget250 {
   _buildDOM(container) {
     this.slot = container;
     this.slot.innerHTML = `
-      <div class="sw-visual">
-        <div class="sw-halo"  data-ref="halo"></div>
-        <div class="sw-core"  data-ref="core">
-          <div class="sw-sn"   data-ref="sn"   style="display:none">💥</div>
-          <div class="sw-beam" data-ref="beam" style="display:none"></div>
-          <div class="pisn-particles" data-ref="particles"></div>
+      <div class="sw-visual" style="position:relative;display:flex;align-items:center;justify-content:center;min-height:260px;width:100%;">
+        <div class="sw250-space"></div>
+        <div class="sw250-halo"  data-ref="halo"></div>
+        <div class="sw250-halo2" data-ref="halo2"></div>
+        <div class="sw250-core"  data-ref="core">
+          <div class="sw250-corona" data-ref="corona"></div>
+          <div class="sw250-surface" data-ref="surface"></div>
+          <div class="sw250-flare1" data-ref="flare1"></div>
+          <div class="sw250-flare2" data-ref="flare2"></div>
+          <div class="sw250-sn" data-ref="sn" style="display:none">
+            <div class="pisn-ring1"></div>
+            <div class="pisn-ring2"></div>
+            <div class="pisn-ring3"></div>
+            <div class="pisn-boom">💥</div>
+          </div>
         </div>
-        <div class="sw-age" data-ref="age">0</div>
+        <div class="sw250-age" data-ref="age">0</div>
+        <div class="sw250-phase-badge" data-ref="phaseBadge"></div>
       </div>
-      <div class="sw-info">
-        <div class="sw-pname" data-ref="pname">分子云</div>
-        <div class="sw-meta">
-          <span data-ref="pspan"></span>
-          <span data-ref="temp"></span>
-          <span data-ref="lum"></span>
-          <span data-ref="radius"></span>
+      <div class="sw250-info">
+        <div class="sw250-pname" data-ref="pname">分子云</div>
+        <div class="sw250-meta-row">
+          <div class="sw250-meta-item"><span class="sw250-meta-label">时间跨度</span><span data-ref="pspan" class="sw250-meta-val">—</span></div>
+          <div class="sw250-meta-item"><span class="sw250-meta-label">表面温度</span><span data-ref="temp" class="sw250-meta-val">—</span></div>
+          <div class="sw250-meta-item"><span class="sw250-meta-label">光度</span><span data-ref="lum" class="sw250-meta-val">—</span></div>
+          <div class="sw250-meta-item"><span class="sw250-meta-label">半径</span><span data-ref="radius" class="sw250-meta-val">—</span></div>
         </div>
-        <div class="sw-note" data-ref="note"></div>
+        <div class="sw250-note" data-ref="note"></div>
       </div>
     `;
     const get = k => this.slot.querySelector(`[data-ref="${k}"]`);
     this.$ = {
-      halo:      get("halo"),
-      core:      get("core"),
-      sn:        get("sn"),
-      beam:      get("beam"),
-      particles: get("particles"),
-      age:       get("age"),
-      pname:     get("pname"),
-      pspan:     get("pspan"),
-      temp:      get("temp"),
-      lum:       get("lum"),
-      radius:    get("radius"),
-      note:      get("note")
+      halo:       get("halo"),
+      halo2:      get("halo2"),
+      core:       get("core"),
+      corona:     get("corona"),
+      surface:    get("surface"),
+      flare1:     get("flare1"),
+      flare2:     get("flare2"),
+      sn:         get("sn"),
+      age:        get("age"),
+      phaseBadge: get("phaseBadge"),
+      pname:      get("pname"),
+      pspan:      get("pspan"),
+      temp:       get("temp"),
+      lum:        get("lum"),
+      radius:     get("radius"),
+      note:       get("note")
     };
   }
 
@@ -111,73 +139,294 @@ class StarWidget250 {
     const t      = range.end === range.start ? 0 : (progress - range.start) / (range.end - range.start);
 
     const age    = lerp250(phase.ageStartMyr, phase.ageEndMyr, t);
-    const lum    = lerp250(phase.lumLsun,     next.lumLsun,    t * 0.3);
+    const lum    = lerp250(phase.lumLsun,     next.lumLsun,    t * 0.4);
     const temp   = lerp250(phase.tempK,       next.tempK,      t * 0.3);
     const radius = lerp250(phase.radiusRsun,  next.radiusRsun, t * 0.3);
 
-    const isSN       = phase.special === "pisn";
-    const isPrePISN  = phase.special === "pre-pisn";
-    const isNebula   = phase.special === "pisn-nebula";
+    const isSN      = phase.special === "pisn";
+    const isPrePISN = phase.special === "pre-pisn";
+    const isNebula  = phase.special === "pisn-nebula";
+    const isLBV     = phase.key === "lbv";
+    const isWR      = phase.key === "wolf-rayet";
 
-    // ---- sizing ----
-    let size = Math.max(24, Math.min(200, 30 + radius * 0.0004 * 200));
-    // 对某些大半径阶段做对数缩放
-    if (radius > 100) size = Math.max(30, Math.min(180, 30 + Math.log10(radius) * 36));
-    if (isSN) size = Math.min(200, size * (1 + t * 4));
+    // ---- 视觉尺寸（使用手动映射保证每个阶段清晰可见）----
+    let baseSize = PHASE_VISUAL_SIZE[phase.key] || 80;
+    if (isSN) baseSize = Math.min(220, baseSize + t * 160);
 
-    const haloSize = size * (isNebula ? 4.5 : isSN ? 3.5 : 2.6);
+    const size      = baseSize;
+    const haloSize  = size * (isNebula ? 3.8 : isSN ? 4.0 : isLBV ? 3.2 : 2.4);
+    const halo2Size = size * (isNebula ? 5.5 : isSN ? 6.0 : 1.6);
+
+    // ---- 颜色系统 ----
     const color = phase.color;
+    const now   = Date.now();
 
-    // ---- core style ----
-    if (isSN) {
-      this.$.core.style.background = `radial-gradient(circle, #ffffff 0%, #ffffcc 20%, #ffee88 45%, ${color} 70%, transparent 100%)`;
-      this.$.core.style.boxShadow  = `0 0 ${Math.round(size * 2)}px rgba(255,240,100,${0.6+t*0.4}), 0 0 ${Math.round(size * 4)}px rgba(255,180,50,0.3)`;
-      this.$.core.classList.remove("star-danger", "star-nebula");
-    } else if (isPrePISN) {
-      const pulse = 0.6 + 0.4 * Math.sin(Date.now() / 200);
-      this.$.core.style.background = `radial-gradient(circle at 35% 30%, #ffff88 0%, #ffaa22 45%, ${color} 80%)`;
-      this.$.core.style.boxShadow  = `0 0 ${Math.round(size * pulse * 1.5)}px rgba(255,150,50,${pulse})`;
-      this.$.core.classList.add("star-danger");
-      this.$.core.classList.remove("star-nebula");
-    } else if (isNebula) {
-      this.$.core.style.background = `radial-gradient(circle at 50% 50%, transparent 0%, rgba(255,120,60,0.2) 30%, ${color} 60%, rgba(255,80,40,0.4) 80%, transparent 100%)`;
-      this.$.core.style.boxShadow  = `0 0 ${Math.round(size * 1.5)}px rgba(255,130,60,0.4)`;
-      this.$.core.classList.add("star-nebula");
-      this.$.core.classList.remove("star-danger");
-    } else {
-      // 普通阶段：高亮蓝白色
-      this.$.core.style.background = `radial-gradient(circle at 32% 28%, #ffffff 0%, ${color} 50%, #180010 100%)`;
-      this.$.core.style.boxShadow  = `0 0 ${Math.round(size * 0.5)}px ${phase.halo}`;
-      this.$.core.classList.remove("star-danger", "star-nebula");
-    }
-
+    // ============================================================
+    // 各阶段专属视觉
+    // ============================================================
     this.$.core.style.width   = `${size}px`;
     this.$.core.style.height  = `${size}px`;
+    this.$.core.style.borderRadius = "50%";
+    this.$.core.style.position     = "relative";
+    this.$.core.style.zIndex       = "10";
+    this.$.core.style.flexShrink   = "0";
 
-    // ---- halo ----
-    this.$.halo.style.width  = `${haloSize}px`;
-    this.$.halo.style.height = `${haloSize}px`;
+    // 清除所有动画类
+    this.$.core.classList.remove("sw250-danger", "sw250-lbv-pulse", "sw250-wr-glow", "sw250-nebula-float");
+
     if (isSN) {
-      this.$.halo.style.background = `radial-gradient(circle, rgba(255,240,160,${0.7+t*0.3}) 0%, rgba(255,160,60,0.2) 45%, transparent 75%)`;
+      // ---- PISN 爆炸 ----
+      const blast = Math.min(1, t * 1.5);
+      this.$.core.style.background = `radial-gradient(circle at 50% 50%,
+        #ffffff 0%,
+        #fffff0 8%,
+        #ffff88 18%,
+        #ffdd44 32%,
+        #ff8822 52%,
+        ${color} 72%,
+        rgba(200,60,20,0.5) 88%,
+        transparent 100%)`;
+      this.$.core.style.boxShadow = `
+        0 0 ${Math.round(size * 0.8)}px rgba(255,255,200,0.95),
+        0 0 ${Math.round(size * 2)}px rgba(255,200,60,0.7),
+        0 0 ${Math.round(size * 4)}px rgba(255,120,20,0.4),
+        0 0 ${Math.round(size * 7)}px rgba(255,60,0,0.15)`;
+
+      // 爆炸环
+      this.$.sn.style.display = "";
+      const rings = this.$.sn.querySelectorAll(".pisn-ring1,.pisn-ring2,.pisn-ring3");
+      rings.forEach((r, i) => {
+        const rScale = 1 + (blast + i * 0.3) * 3.5;
+        r.style.transform = `translate(-50%,-50%) scale(${rScale})`;
+        r.style.opacity   = String(Math.max(0, 1 - blast - i * 0.25));
+      });
+      const boom = this.$.sn.querySelector(".pisn-boom");
+      if (boom) { boom.style.fontSize = `${Math.round(size * 0.55)}px`; }
+
+      // halo
+      this.$.halo.style.background = `radial-gradient(circle,
+        rgba(255,255,200,${0.6 + blast * 0.35}) 0%,
+        rgba(255,200,80,0.4) 30%,
+        rgba(255,120,20,0.15) 60%,
+        transparent 80%)`;
+
+      this.$.halo2.style.background = `radial-gradient(circle,
+        rgba(255,200,100,0.2) 0%,
+        rgba(255,100,20,0.08) 45%,
+        transparent 70%)`;
+
+      // surface 和 corona 隐藏
+      this.$.surface.style.display = "none";
+      this.$.corona.style.display  = "none";
+      this.$.flare1.style.display  = "none";
+      this.$.flare2.style.display  = "none";
+
+    } else if (isPrePISN) {
+      // ---- 对不稳定前夕：危险脉冲 ----
+      const pulse = 0.5 + 0.5 * Math.sin(now / 180);
+      const pulse2= 0.5 + 0.5 * Math.sin(now / 280 + 1.2);
+      this.$.core.style.background = `radial-gradient(circle at 38% 32%,
+        #ffffff 0%,
+        #ffff66 10%,
+        #ffcc22 28%,
+        #ff6600 55%,
+        ${color} 80%,
+        #220000 100%)`;
+      this.$.core.style.boxShadow = `
+        0 0 ${Math.round(size * (0.6 + pulse * 0.6))}px rgba(255,${Math.round(100 + pulse * 80)},20,${0.7 + pulse * 0.3}),
+        0 0 ${Math.round(size * (1.2 + pulse2))}px rgba(255,80,0,${0.4 + pulse2 * 0.3}),
+        inset 0 0 ${Math.round(size * 0.3)}px rgba(255,255,100,0.4)`;
+      this.$.core.classList.add("sw250-danger");
+      this.$.sn.style.display = "none";
+      this.$.surface.style.display = "";
+      this.$.corona.style.display  = "";
+      this.$.flare1.style.display  = "";
+      this.$.flare2.style.display  = "";
+
+      // 危险晕圈
+      this.$.halo.style.background = `radial-gradient(circle,
+        rgba(255,${Math.round(120 + pulse * 80)},20,${0.45 + pulse * 0.3}) 0%,
+        rgba(255,60,0,0.2) 40%,
+        rgba(200,20,0,0.05) 65%,
+        transparent 80%)`;
+      this.$.halo2.style.background = `radial-gradient(circle,
+        rgba(255,80,0,0.15) 0%,
+        rgba(200,20,0,0.06) 50%,
+        transparent 70%)`;
+
     } else if (isNebula) {
-      this.$.halo.style.background = `radial-gradient(circle, rgba(255,120,60,0.4) 0%, rgba(200,80,40,0.15) 40%, rgba(100,40,20,0.05) 65%, transparent 80%)`;
+      // ---- 超新星遗迹星云 ----
+      this.$.core.style.background = `radial-gradient(circle at 50% 50%,
+        rgba(255,220,100,0.15) 0%,
+        rgba(255,140,40,0.3) 20%,
+        ${color} 45%,
+        rgba(200,80,20,0.35) 65%,
+        rgba(100,30,10,0.1) 80%,
+        transparent 100%)`;
+      this.$.core.style.boxShadow = `
+        0 0 ${Math.round(size * 1.2)}px rgba(255,140,40,0.5),
+        0 0 ${Math.round(size * 2.2)}px rgba(200,80,20,0.25)`;
+      this.$.core.classList.add("sw250-nebula-float");
+      this.$.sn.style.display = "none";
+      this.$.surface.style.display = "";
+      this.$.corona.style.display  = "none";
+      this.$.flare1.style.display  = "none";
+      this.$.flare2.style.display  = "none";
+
+      this.$.halo.style.background = `radial-gradient(circle,
+        rgba(255,140,60,0.35) 0%,
+        rgba(220,100,30,0.18) 35%,
+        rgba(150,50,10,0.08) 60%,
+        transparent 80%)`;
+      this.$.halo2.style.background = `radial-gradient(circle,
+        rgba(200,80,20,0.12) 0%,
+        rgba(150,40,10,0.05) 50%,
+        transparent 75%)`;
+
+    } else if (isLBV) {
+      // ---- 亮蓝变星：不稳定脉动 ----
+      const ejPulse = 0.5 + 0.5 * Math.sin(now / 700);
+      this.$.core.style.background = `radial-gradient(circle at 36% 30%,
+        #ffffff 0%,
+        #ffeeff 10%,
+        #ff99cc 30%,
+        ${color} 60%,
+        #330010 100%)`;
+      this.$.core.style.boxShadow = `
+        0 0 ${Math.round(size * 0.7)}px rgba(255,100,180,0.8),
+        0 0 ${Math.round(size * (1.5 + ejPulse))}px rgba(220,60,140,${0.4 + ejPulse * 0.25}),
+        0 0 ${Math.round(size * 3)}px rgba(180,30,100,0.15)`;
+      this.$.core.classList.add("sw250-lbv-pulse");
+      this.$.sn.style.display = "none";
+      this.$.surface.style.display = "";
+      this.$.corona.style.display  = "";
+      this.$.flare1.style.display  = "";
+      this.$.flare2.style.display  = "";
+
+      this.$.halo.style.background = `radial-gradient(circle,
+        rgba(255,100,180,${0.3 + ejPulse * 0.25}) 0%,
+        rgba(200,60,130,0.15) 40%,
+        rgba(150,20,80,0.05) 65%,
+        transparent 80%)`;
+      this.$.halo2.style.background = `radial-gradient(circle,
+        rgba(220,80,150,0.1) 0%,
+        transparent 55%)`;
+
+    } else if (isWR) {
+      // ---- 沃夫-拉叶：极热裸核 ----
+      this.$.core.style.background = `radial-gradient(circle at 35% 28%,
+        #ffffff 0%,
+        #eeeeff 8%,
+        #aaccff 22%,
+        ${color} 50%,
+        #330033 85%,
+        #110011 100%)`;
+      this.$.core.style.boxShadow = `
+        0 0 ${Math.round(size * 0.6)}px rgba(180,200,255,0.9),
+        0 0 ${Math.round(size * 1.5)}px rgba(120,160,255,0.5),
+        0 0 ${Math.round(size * 3)}px rgba(80,100,255,0.2),
+        inset 0 0 ${Math.round(size * 0.2)}px rgba(255,255,255,0.5)`;
+      this.$.core.classList.add("sw250-wr-glow");
+      this.$.sn.style.display = "none";
+      this.$.surface.style.display = "";
+      this.$.corona.style.display  = "";
+      this.$.flare1.style.display  = "none";
+      this.$.flare2.style.display  = "none";
+
+      this.$.halo.style.background = `radial-gradient(circle,
+        rgba(150,180,255,0.35) 0%,
+        rgba(100,130,255,0.15) 38%,
+        rgba(60,80,200,0.06) 62%,
+        transparent 80%)`;
+      this.$.halo2.style.background = `radial-gradient(circle,
+        rgba(100,140,255,0.1) 0%,
+        transparent 55%)`;
+
     } else {
-      this.$.halo.style.background = `radial-gradient(circle, ${phase.halo} 0%, rgba(255,50,100,0.06) 55%, transparent 80%)`;
+      // ---- 普通阶段（分子云、原恒星、ZAMS、O型超巨星）----
+      // 根据温度选渐变色调
+      let innerColor = "#ffffff";
+      let midColor   = color;
+      let outerColor = "#110022";
+
+      if (temp > 40000) {
+        innerColor = "#ffffff"; midColor = "#99ccff"; outerColor = "#000033";
+      } else if (temp > 20000) {
+        innerColor = "#ffffff"; midColor = "#aaddff"; outerColor = "#001133";
+      } else if (temp > 8000) {
+        innerColor = "#fffff0"; midColor = color; outerColor = "#110000";
+      } else {
+        innerColor = "#ffeecc"; midColor = color; outerColor = "#220000";
+      }
+
+      this.$.core.style.background = `radial-gradient(circle at 32% 28%,
+        ${innerColor} 0%,
+        ${innerColor} 12%,
+        ${midColor} 50%,
+        ${outerColor} 100%)`;
+
+      // 光晕强度随温度/亮度变化
+      const glowStrength = Math.min(1, lum / 3000000);
+      const glowR = temp > 30000 ? 100 : temp > 15000 ? 140 : 200;
+      const glowG = temp > 30000 ? 140 : temp > 15000 ? 170 : 130;
+      const glowB = temp > 30000 ? 255 : 180;
+
+      this.$.core.style.boxShadow = `
+        0 0 ${Math.round(size * 0.4)}px rgba(${glowR},${glowG},${glowB},0.9),
+        0 0 ${Math.round(size * 1.0)}px rgba(${glowR},${glowG},${glowB},${0.35 + glowStrength * 0.35}),
+        0 0 ${Math.round(size * 2.2)}px rgba(${glowR},${glowG},${glowB},${0.12 + glowStrength * 0.15}),
+        inset 0 0 ${Math.round(size * 0.25)}px rgba(255,255,255,0.3)`;
+
+      this.$.sn.style.display = "none";
+      this.$.surface.style.display = "";
+      this.$.corona.style.display  = "";
+      this.$.flare1.style.display  = "";
+      this.$.flare2.style.display  = "none";
+
+      this.$.halo.style.background = `radial-gradient(circle,
+        rgba(${glowR},${glowG},${glowB},${0.25 + glowStrength * 0.2}) 0%,
+        rgba(${glowR},${glowG},${glowB},0.1) 40%,
+        rgba(${glowR},${glowG},${glowB},0.03) 65%,
+        transparent 80%)`;
+
+      this.$.halo2.style.background = `radial-gradient(circle,
+        rgba(${glowR},${glowG},${glowB},0.08) 0%,
+        transparent 60%)`;
     }
 
-    // ---- overlays ----
-    this.$.sn.style.display = isSN ? "" : "none";
-    if (isSN) {
-      this.$.sn.style.fontSize = `${Math.round(size * 0.6)}px`;
-    }
+    // ---- halo 尺寸 ----
+    this.$.halo.style.width    = `${haloSize}px`;
+    this.$.halo.style.height   = `${haloSize}px`;
+    this.$.halo2.style.width   = `${halo2Size}px`;
+    this.$.halo2.style.height  = `${halo2Size}px`;
+
+    // ---- 阶段徽章 ----
+    const badgeColors = {
+      "cloud":        "#9988ff",
+      "protostar":    "#ff88bb",
+      "zams":         "#4499ff",
+      "o-supergiant": "#2266ff",
+      "lbv":          "#ff66cc",
+      "wolf-rayet":   "#88aaff",
+      "pre-pisn":     "#ff6600",
+      "pisn":         "#ffdd00",
+      "pisn-nebula":  "#ff8833",
+    };
+    this.$.phaseBadge.textContent = phase.name;
+    this.$.phaseBadge.style.background = `rgba(0,0,0,0.5)`;
+    this.$.phaseBadge.style.borderColor = (badgeColors[phase.key] || "#6688cc") + "66";
+    this.$.phaseBadge.style.color = badgeColors[phase.key] || "#aaccff";
 
     // ---- info ----
     this.$.age.textContent    = formatAge250(age);
     this.$.pname.textContent  = phase.name;
     this.$.pspan.textContent  = phase.spanLabel;
-    this.$.temp.textContent   = `🌡 ${Math.round(temp).toLocaleString()} K`;
-    this.$.lum.textContent    = `☀ ${formatLum250(lum)}`;
-    this.$.radius.textContent = `⊙ ${radius >= 1000 ? (radius/1000).toFixed(0)+'K' : radius >= 10 ? radius.toFixed(0) : radius.toFixed(3)} R☉`;
+    this.$.temp.textContent   = `${Math.round(temp).toLocaleString()} K`;
+    this.$.lum.textContent    = `${formatLum250(lum)} L☉`;
+    this.$.radius.textContent = radius >= 1000000 ? `${(radius/1000000).toFixed(1)}M R☉` :
+                                 radius >= 1000    ? `${(radius/1000).toFixed(1)}K R☉` :
+                                 radius >= 10      ? `${radius.toFixed(0)} R☉` :
+                                                     `${radius.toFixed(3)} R☉`;
     this.$.note.textContent   = phase.note;
 
     this._currentPhase = phase;
@@ -207,25 +456,28 @@ class Star250App {
     this._buildWidget();
     this._buildMilestones();
     this._bindEvents();
+    this._startAnimLoop();
     this._updateProgressBar(0);
     this._updateTeachBar(0);
+    // 初始渲染
+    this.widget.render(0);
   }
 
   _bindElements() {
-    this.playBtn      = document.getElementById("playBtn");
-    this.resetBtn     = document.getElementById("resetBtn");
-    this.speedSel     = document.getElementById("speedSelect");
-    this.progressEl   = document.getElementById("progressBar");
-    this.teachBar     = document.getElementById("teachBar");
-    this.teachEmoji   = document.getElementById("teachEmoji");
-    this.teachTitle   = document.getElementById("teachTitle");
-    this.teachCapEl   = document.getElementById("teachCaption");
-    this.stageLabel   = document.getElementById("stageLabel");
-    this.endingOverlay= document.getElementById("endingOverlay");
-    this.teachToggle  = document.getElementById("teachToggle");
-    this.quizSection  = document.getElementById("quizSection");
-    this.pisnFlash    = document.getElementById("pisnFlash");
-    this.snFlash      = document.getElementById("snFlash");
+    this.playBtn       = document.getElementById("playBtn");
+    this.resetBtn      = document.getElementById("resetBtn");
+    this.speedSel      = document.getElementById("speedSelect");
+    this.progressEl    = document.getElementById("progressBar");
+    this.teachBar      = document.getElementById("teachBar");
+    this.teachEmoji    = document.getElementById("teachEmoji");
+    this.teachTitle    = document.getElementById("teachTitle");
+    this.teachCapEl    = document.getElementById("teachCaption");
+    this.stageLabel    = document.getElementById("stageLabel");
+    this.endingOverlay = document.getElementById("endingOverlay");
+    this.teachToggle   = document.getElementById("teachToggle");
+    this.quizSection   = document.getElementById("quizSection");
+    this.pisnFlash     = document.getElementById("pisnFlash");
+    this.snFlash       = document.getElementById("snFlash");
   }
 
   _buildWidget() {
@@ -237,7 +489,7 @@ class Star250App {
     slot.innerHTML = `<div class="slot-header" style="--c:#ff3366">
       <span class="slot-mass">250 M☉</span>
       <span class="slot-name">极端大质量恒星</span>
-      <span class="slot-fate" style="color:#ffdd88">💥 不稳定对超新星</span>
+      <span class="slot-fate" style="color:#ffdd88">💥 不稳定对超新星（PISN）</span>
     </div>`;
     const widgetEl = document.createElement("div");
     widgetEl.className = "sw-container";
@@ -248,13 +500,14 @@ class Star250App {
 
   _buildMilestones() {
     const milestones = [
-      { pct: 0,   label: "0" },
-      { pct: 20,  label: "分子云" },
-      { pct: 45,  label: "蓝超巨星" },
-      { pct: 65,  label: "LBV" },
-      { pct: 82,  label: "沃夫-拉叶" },
-      { pct: 93,  label: "⚠️PISN前" },
-      { pct: 100, label: "💥PISN" }
+      { pct: 0,   label: "☁️" },
+      { pct: 18,  label: "原恒星" },
+      { pct: 30,  label: "O型" },
+      { pct: 50,  label: "LBV" },
+      { pct: 68,  label: "WR星" },
+      { pct: 84,  label: "⚠️前夕" },
+      { pct: 94,  label: "💥PISN" },
+      { pct: 100, label: "🌈遗迹" }
     ];
     const bar = document.getElementById("milestoneBar");
     bar.innerHTML = milestones.map(m =>
@@ -262,60 +515,73 @@ class Star250App {
     ).join("");
   }
 
+  // 独立动画循环：处理持续动画阶段（pre-pisn、lbv、pisn）
+  _startAnimLoop() {
+    const loop = () => {
+      if (this.widget) {
+        const sp = this.widget.getCurrentPhase().special;
+        const k  = this.widget.getCurrentPhase().key;
+        if (sp === "pre-pisn" || sp === "pisn" || k === "lbv" || k === "wolf-rayet") {
+          this.widget.render(this.progress);
+        }
+        // PISN 持续闪光
+        if (sp === "pisn") {
+          const f = 0.4 + 0.6 * Math.abs(Math.sin(Date.now() / 80));
+          this.pisnFlash.style.opacity = String(f);
+        } else {
+          this.pisnFlash.style.opacity = "0";
+        }
+        if (sp === "pre-pisn") {
+          this.snFlash.style.opacity = String(0.04 + 0.04 * Math.sin(Date.now() / 300));
+        } else if (sp !== "pisn") {
+          this.snFlash.style.opacity = "0";
+        }
+      }
+      requestAnimationFrame(loop);
+    };
+    loop();
+  }
+
   render(progress) {
     if (!this.widget) return;
-    const result = this.widget.render(progress);
+    const result  = this.widget.render(progress);
     const special = result.phase.special;
 
-    // 更新教学栏
     this._updateTeachBar(progress);
     this._updateProgressBar(progress);
 
-    // PISN 特效
-    if (special === "pisn") {
-      this.pisnFlash.style.opacity = String(0.3 + result.phase && 0.7);
-      if (!this._pisnTriggered) {
-        this._pisnTriggered = true;
-        this._triggerPISN();
-      }
-      // 持续闪光
-      this.pisnFlash.style.opacity = String(0.5 + 0.5 * Math.sin(Date.now() / 80));
-    } else {
-      this.pisnFlash.style.opacity = "0";
-    }
-
-    if (special === "pre-pisn") {
-      this.snFlash.style.opacity = String(0.05 + 0.05 * Math.sin(Date.now() / 300));
-    } else if (special !== "pisn") {
-      this.snFlash.style.opacity = "0";
-    }
-
     // 重置触发标志
-    if (progress < 800) {
+    if (progress < 850) {
       this._pisnTriggered = false;
       this._endingShown   = false;
       this.endingOverlay.classList.remove("visible");
     }
 
+    // 第一次进入 PISN 时触发震动
+    if (special === "pisn" && !this._pisnTriggered) {
+      this._pisnTriggered = true;
+      this._triggerPISNShake();
+    }
+
     // 遗迹阶段显示结局弹窗
-    if (special === "pisn-nebula" && !this._endingShown && progress > 900) {
+    if (special === "pisn-nebula" && !this._endingShown && progress > 940) {
       this._endingShown = true;
       this._showEnding();
     }
   }
 
-  _triggerPISN() {
-    // 屏幕剧烈抖动
+  _triggerPISNShake() {
     document.body.classList.remove("screen-shake");
-    requestAnimationFrame(() => document.body.classList.add("screen-shake"));
-    setTimeout(() => document.body.classList.remove("screen-shake"), 600);
+    void document.body.offsetWidth;
+    document.body.classList.add("screen-shake");
+    setTimeout(() => document.body.classList.remove("screen-shake"), 800);
 
     // 多次闪光
     let count = 0;
     const flash = () => {
-      this.pisnFlash.style.opacity = count % 2 === 0 ? "0.9" : "0.1";
+      this.pisnFlash.style.opacity = count % 2 === 0 ? "0.92" : "0.05";
       count++;
-      if (count < 8) setTimeout(flash, 120);
+      if (count < 10) setTimeout(flash, 100);
     };
     flash();
   }
@@ -337,20 +603,20 @@ class Star250App {
   }
 
   _updateProgressBar(progress) {
-    const pct = (progress / MAX_PROGRESS_250) * 100;
+    const pct   = (progress / MAX_PROGRESS_250) * 100;
     const thumb = document.getElementById("progressThumb");
     const fill  = document.getElementById("progressFill");
     if (thumb) thumb.style.left = `${pct}%`;
-    if (fill)  fill.style.width  = `${pct}%`;
+    if (fill)  fill.style.width = `${pct}%`;
   }
 
   _showEnding() {
-    const star = STAR_250M;
+    const star    = STAR_250M;
     const overlay = this.endingOverlay;
     overlay.querySelector(".ending-title").textContent = star.endingTitle;
     overlay.querySelector(".ending-desc").textContent  = star.endingDesc;
     overlay.querySelector(".ending-badge").textContent = star.endingBadge;
-    overlay.querySelector(".ending-badge").style.color = star.fateColor;
+    overlay.querySelector(".ending-badge").style.color = star.fateColor || "#ffdd88";
     const noteEl = document.getElementById("endingNote");
     if (noteEl && star.endingNote) {
       noteEl.textContent = star.endingNote;
@@ -361,7 +627,7 @@ class Star250App {
 
   _tick() {
     if (!this.playing) return;
-    this.progress = Math.min(MAX_PROGRESS_250, this.progress + this.speed * 1.1);
+    this.progress = Math.min(MAX_PROGRESS_250, this.progress + this.speed * 1.2);
     if (this.progress >= MAX_PROGRESS_250) {
       this.progress = MAX_PROGRESS_250;
       this.playing  = false;
@@ -380,8 +646,7 @@ class Star250App {
   }
 
   _bindEvents() {
-    this.playBtn.addEventListener("click", () => this._setPlaying(!this.playing));
-
+    this.playBtn.addEventListener("click",  () => this._setPlaying(!this.playing));
     this.resetBtn.addEventListener("click", () => {
       this.progress = 0;
       this.progressEl.value = "0";
@@ -395,9 +660,7 @@ class Star250App {
       this.render(0);
     });
 
-    this.speedSel.addEventListener("change", e => {
-      this.speed = Number(e.target.value);
-    });
+    this.speedSel.addEventListener("change", e => { this.speed = Number(e.target.value); });
 
     this.progressEl.addEventListener("input", e => {
       this.progress = Number(e.target.value);
@@ -420,19 +683,7 @@ class Star250App {
       document.getElementById("quizPanel").classList.toggle("hidden");
     });
 
-    // 拖拽进度条（鼠标 + 触屏）
     this._bindProgressDrag();
-
-    // pre-pisn 危险脉冲刷新
-    setInterval(() => {
-      const sp = this.widget && this.widget.getCurrentPhase().special;
-      if (sp === "pre-pisn" || sp === "pisn") {
-        this.widget.render(this.progress);
-      }
-      if (sp === "pisn") {
-        this.pisnFlash.style.opacity = String(0.4 + 0.6 * Math.abs(Math.sin(Date.now() / 80)));
-      }
-    }, 40);
   }
 
   _bindProgressDrag() {
@@ -474,7 +725,7 @@ class Star250App {
       ${STAR_250M.quiz.map((item, i) => `
         <div class="quiz-item" id="qi-${i}">
           <div class="qi-q">${item.icon} ${item.q}</div>
-          <button class="qi-btn" data-idx="${i}">我知道答案！</button>
+          <button class="qi-btn" data-idx="${i}">揭晓答案</button>
           <div class="qi-a hidden">${item.a}</div>
         </div>
       `).join("")}
