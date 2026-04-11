@@ -144,6 +144,7 @@ class UniverseStageCard {
     this.onFocus = onFocus;
     this.ranges = buildRanges(star.phases);
     this.container = container;
+    this._lastPhaseIdx = -1;
     this.container.innerHTML = this.buildTemplate();
     this.bind();
   }
@@ -267,11 +268,11 @@ class UniverseStageCard {
     } else if (phaseClass === "pisn") {
       this.core.style.background = `radial-gradient(circle, #ffffff 0%, #fff3b0 22%, #ffb14d 55%, rgba(255,120,40,0.2) 82%, transparent 100%)`;
       this.core.style.boxShadow = `0 0 ${Math.round(size * 1.8)}px rgba(255,220,150,0.95), 0 0 ${Math.round(size * 3.4)}px rgba(255,160,70,0.42)`;
-      this.pulseRing(this.pisnRing);
+      if (idx !== this._lastPhaseIdx) this.pulseRing(this.pisnRing);
     } else if (phaseClass === "supernova") {
       this.core.style.background = `radial-gradient(circle, #ffffff 0%, #fff3cd 30%, ${color} 65%, transparent 100%)`;
       this.core.style.boxShadow = `0 0 ${Math.round(size * 1.6)}px rgba(255,230,170,0.92)`;
-      this.pulseRing(this.supernovaRing);
+      if (idx !== this._lastPhaseIdx) this.pulseRing(this.supernovaRing);
     } else if (phaseClass === "nebula") {
       this.core.style.background = `radial-gradient(circle, rgba(255,255,255,0.24) 0%, ${color} 28%, rgba(255,170,120,0.18) 55%, transparent 100%)`;
       this.core.style.boxShadow = `0 0 ${Math.round(size * 1.4)}px rgba(255,180,120,0.24)`;
@@ -291,6 +292,8 @@ class UniverseStageCard {
 
     this.halo.style.background = `radial-gradient(circle, ${phase.halo} 0%, rgba(120,140,255,0.07) 58%, transparent 76%)`;
     this.haloOuter.style.background = `radial-gradient(circle, rgba(255,255,255,0.06) 0%, ${phase.halo.replace(/0?\.\d+\)/, "0.12)")} 48%, transparent 76%)`;
+
+    this._lastPhaseIdx = idx;
 
     return { star: this.star, phase, age, idx, phaseClass };
   }
