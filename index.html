@@ -65,15 +65,6 @@
           <button id="showFocusBtn" class="mini-btn">只看焦点</button>
         </div>
       </div>
-
-      <div class="progress-wrap">
-        <input id="progressBar" type="range" min="0" max="1000" value="0" />
-        <div class="progress-labels">
-          <span>起点</span>
-          <span id="progressText">进度 0%</span>
-          <span>终章</span>
-        </div>
-      </div>
     </section>
 
     <section class="stage-wrap glass-panel stage-fullscreen-friendly">
@@ -83,6 +74,20 @@
           <h2 id="stageTitle">五颗恒星同屏演化</h2>
         </div>
         <div id="selectionHint" class="selection-hint"></div>
+      </div>
+      <div class="stage-topbar">
+        <div class="progress-wrap stage-progress-wrap">
+          <div class="stage-progress-head">
+            <span class="stage-progress-title">统一时间轴</span>
+            <span class="stage-progress-order">默认排序：按恒星质量从小到大</span>
+          </div>
+          <input id="progressBar" type="range" min="0" max="1000" value="0" />
+          <div class="progress-labels">
+            <span>起点</span>
+            <span id="progressText">进度 0%</span>
+            <span>终章</span>
+          </div>
+        </div>
       </div>
       <div id="stageGrid" class="stage-grid"></div>
     </section>

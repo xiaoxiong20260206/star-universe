@@ -381,7 +381,9 @@ class StarUniverseApp {
   }
 
   getSelectedStars() {
-    return this.catalog.filter((item) => this.selected.has(item.key));
+    return this.catalog
+      .filter((item) => this.selected.has(item.key))
+      .sort((a, b) => a.massRatio - b.massRatio);
   }
 
   ensureFocusVisible() {
@@ -426,9 +428,9 @@ class StarUniverseApp {
 
     if (selectedStars.length === 1) {
       columns = 1;
-    } else if (width >= 640) {
-      columns = selectedStars.length;
-    } else if (width >= 520) {
+    } else if (width >= 1180) {
+      columns = Math.min(selectedStars.length, 5);
+    } else if (width >= 820) {
       columns = Math.min(selectedStars.length, 3);
     } else {
       columns = Math.min(selectedStars.length, 2);
@@ -560,7 +562,7 @@ class StarUniverseApp {
     this.stageTitle.textContent = selectedCount === 1 ? `${star.name} · 单星聚焦模式` : `${selectedCount} 颗恒星 · 同屏比较模式`;
     this.selectionHint.textContent = selectedCount === 1
       ? "双击其他星卡可切换焦点；单击星卡可重新加入比较。"
-      : `当前焦点：${star.name} · 单击舞台卡片可切换焦点`;
+      : `当前焦点：${star.name} · 已按质量从小到大排列，可直接拖动上方时间轴`;
 
     this.focusSummary.innerHTML = `
       <h3>${star.name}</h3>
