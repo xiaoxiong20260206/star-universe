@@ -310,6 +310,8 @@ class StarUniverseApp {
     this.rafId = null;
     this.cards = new Map();
     this.lastFxAt = 0;
+    this.endingShown = false;
+    this.quizOpen = false;
 
     this.bindEls();
     createBackgroundStars(this.starsLayer);
@@ -324,6 +326,7 @@ class StarUniverseApp {
     this.stageGrid = document.getElementById("stageGrid");
     this.playBtn = document.getElementById("playBtn");
     this.resetBtn = document.getElementById("resetBtn");
+    this.quizToggleBtn = document.getElementById("quizToggleBtn");
     this.speedSelect = document.getElementById("speedSelect");
     this.progressBar = document.getElementById("progressBar");
     this.selectAllBtn = document.getElementById("selectAllBtn");
@@ -337,6 +340,16 @@ class StarUniverseApp {
     this.teachTitle = document.getElementById("teachTitle");
     this.teachCaption = document.getElementById("teachCaption");
     this.starsLayer = document.getElementById("starsLayer");
+
+    this.endingOverlay = document.getElementById("endingOverlay");
+    this.endingTitle = document.getElementById("endingTitle");
+    this.endingDesc = document.getElementById("endingDesc");
+    this.endingBadge = document.getElementById("endingBadge");
+    this.endingNote = document.getElementById("endingNote");
+    this.endingClose = document.getElementById("endingClose");
+
+    this.quizPanel = document.getElementById("quizPanel");
+    this.quizSection = document.getElementById("quizSection");
   }
 
   getStar(key) {
@@ -461,6 +474,50 @@ class StarUniverseApp {
     }, type === "pisn" ? 220 : 140);
   }
 
+  showEnding(star) {
+    if (!star) return;
+    this.endingTitle.textContent = star.endingTitle || "终章";
+    this.endingDesc.textContent = star.endingDesc || star.summary || "";
+    this.endingBadge.textContent = star.endingBadge || star.fate || "";
+    this.endingBadge.style.color = star.fateColor || "#d6e6ff";
+    this.endingNote.textContent = star.endingNote || "";
+    this.endingOverlay.classList.add("visible");
+  }
+
+  hideEnding() {
+    this.endingOverlay.classList.remove("visible");
+  }
+
+  renderQuiz(star) {
+    if (!star || !this.quizSection) return;
+    const quizList = Array.isArray(star.quiz) ? star.quiz : [];
+    if (!quizList.length) {
+      this.quizSection.innerHTML = `<div class="quiz-empty">当前恒星暂无问答内容。</div>`;
+      return;
+    }
+
+    this.quizSection.innerHTML = `
+      <h3 class="quiz-title">🧩 趣味问答 · ${star.name}</h3>
+      ${quizList.map((item, i) => `
+        <div class="quiz-item" id="quiz-${i}">
+          <div class="qi-q">${item.icon || "✨"} ${item.q || ""}</div>
+          <button class="qi-btn" data-idx="${i}">揭晓答案</button>
+          <div class="qi-a hidden">${item.a || ""}</div>
+        </div>
+      `).join("")}
+    `;
+
+    this.quizSection.querySelectorAll(".qi-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const item = document.getElementById(`quiz-${btn.dataset.idx}`);
+        if (!item) return;
+        const answer = item.querySelector(".qi-a");
+        if (answer) answer.classList.remove("hidden");
+        btn.style.display = "none";
+      });
+    });
+  }
+
   updateFocusSummary(result) {
     const { star, phase, age, phaseClass } = result;
     const selectedCount = this.selected.size;
@@ -491,6 +548,8 @@ class StarUniverseApp {
     this.resetBtn.addEventListener("click", () => {
       this.progress = 0;
       this.progressBar.value = "0";
+      this.endingShown = false;
+      this.hideEnding();
       this.setPlaying(false);
       this.render();
     });
@@ -499,6 +558,10 @@ class StarUniverseApp {
     });
     this.progressBar.addEventListener("input", (event) => {
       this.progress = Number(event.target.value);
+      if (this.progress < MAX_PROGRESS) {
+        this.endingShown = false;
+        this.hideEnding();
+      }
       this.render();
     });
     this.selectAllBtn.addEventListener("click", () => {
@@ -510,6 +573,22 @@ class StarUniverseApp {
     this.showFocusBtn.addEventListener("click", () => {
       this.focusOnly(this.focusKey);
     });
+
+    if (this.quizToggleBtn) {
+      this.quizToggleBtn.addEventListener("click", () => {
+        this.quizOpen = !this.quizOpen;
+        this.quizPanel.classList.toggle("hidden", !this.quizOpen);
+        this.quizToggleBtn.classList.toggle("active", this.quizOpen);
+        if (this.quizOpen) {
+          const focusStar = this.getStar(this.focusKey);
+          this.renderQuiz(focusStar);
+        }
+      });
+    }
+
+    if (this.endingClose) {
+      this.endingClose.addEventListener("click", () => this.hideEnding());
+    }
 
     setInterval(() => {
       const focusCard = this.cards.get(this.focusKey);
@@ -538,7 +617,17 @@ class StarUniverseApp {
       }
     });
 
-    if (focusResult) this.updateFocusSummary(focusResult);
+    if (focusResult) {
+      this.updateFocusSummary(focusResult);
+      if (this.quizOpen) {
+        this.renderQuiz(focusResult.star);
+      }
+    }
+
+    if (this.progress >= MAX_PROGRESS && !this.endingShown && focusResult) {
+      this.endingShown = true;
+      this.showEnding(focusResult.star);
+    }
   }
 }
 

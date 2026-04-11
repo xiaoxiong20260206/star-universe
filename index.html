@@ -18,6 +18,18 @@
 
   <div id="globalFlash" class="global-flash"></div>
 
+  <div id="endingOverlay" class="ending-overlay">
+    <div class="ending-card">
+      <div class="ending-glow"></div>
+      <p class="ending-pre">🎬 演化终章</p>
+      <h2 id="endingTitle" class="ending-title">终章</h2>
+      <p id="endingDesc" class="ending-desc"></p>
+      <div id="endingBadge" class="ending-badge"></div>
+      <p id="endingNote" class="ending-note"></p>
+      <button id="endingClose" class="ending-btn">↺ 继续探索</button>
+    </div>
+  </div>
+
   <main class="page-shell">
     <header class="hero glass-panel">
       <div class="hero-copy">
@@ -53,6 +65,7 @@
       <div class="control-row top">
         <button id="playBtn" class="action-btn primary">▶ 播放</button>
         <button id="resetBtn" class="action-btn ghost">↺ 重置</button>
+        <button id="quizToggleBtn" class="action-btn ghost">🧩 趣味问答</button>
         <label class="speed-box">
           <span>速度</span>
           <select id="speedSelect">
@@ -110,6 +123,10 @@
           <p id="teachCaption">选择一颗恒星作为焦点，点击播放，开始看它的一生。</p>
         </div>
       </div>
+    </section>
+
+    <section id="quizPanel" class="quiz-wrap glass-panel hidden">
+      <div id="quizSection"></div>
     </section>
 
     <footer class="footer-note">
