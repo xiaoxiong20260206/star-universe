@@ -482,4 +482,162 @@ const STAR_MASSIVE = {
 // ============================================================
 // 导出：所有星种数据
 // ============================================================
-const STAR_CATALOG = [STAR_RED_DWARF, STAR_SUN, STAR_MASSIVE];
+
+// ============================================================
+// 4. 地球 — 行星演化（不被太阳吞噬版本）
+// massRatio 极小，排序时位于所有恒星之前
+// ============================================================
+const EARTH = {
+  key: "earth",
+  name: "地球",
+  massLabel: "🌍 地球",
+  massRatio: 0.000003,
+  themeColor: "#4daaff",
+  gradientFrom: "#4daaff",
+  gradientTo: "#1a5a2f",
+  summary: "唯一已知孕育生命的行星，46亿年风雨后静静漂流宇宙深处。",
+  funFact: "地球上所有海洋中的水，如果铺平成一层，厚度约 2.7 公里——但对于行星来说，只是薄薄一层「泪水」。",
+  fate: "🌑 行星核遗迹",
+  fateColor: "#8fa4c8",
+  phases: [
+    {
+      key: "proto-earth",
+      name: "原始地球",
+      ageStartMyr: 0, ageEndMyr: 100,
+      spanLabel: "0 ~ 1 亿年",
+      state: "高温岩浆球",
+      lumLsun: 0.000001, tempK: 2200, radiusRsun: 0.0091,
+      color: "#ff6a30", halo: "rgba(255,100,40,0.6)",
+      note: "刚刚从太阳系尘盘中吸积成形，表面全是熔岩海洋，月球也在此时从一次大碰撞中诞生。",
+      special: "earth-living",
+      teach: {
+        emoji: "🔥",
+        title: "诞生之初：岩浆球时代",
+        caption: "地球刚诞生时是一个灼热的岩浆球，表面温度高达数千度。一颗火星大小的天体「忒伊亚」撞上地球，碎片聚合成了月球。那时候，还没有任何一滴水，更没有任何生命的影子。"
+      }
+    },
+    {
+      key: "hadean",
+      name: "冥古宙",
+      ageStartMyr: 100, ageEndMyr: 600,
+      spanLabel: "1 ~ 6 亿年",
+      state: "海洋形成",
+      lumLsun: 0.0000008, tempK: 700, radiusRsun: 0.0091,
+      color: "#3d8cff", halo: "rgba(60,130,255,0.5)",
+      note: "地壳冷却，水蒸气凝结降雨，原始海洋形成。小行星轰炸带来大量水分，大气充满甲烷和二氧化碳。",
+      special: "earth-living",
+      teach: {
+        emoji: "🌊",
+        title: "冥古宙：第一滴海水",
+        caption: "地球表面冷却下来，天空下起了长达百万年的雨。原始海洋就这样形成了！大气层里没有氧气，只有甲烷、氨气和二氧化碳。但恰恰是这锅「毒汤」，准备孕育第一个生命。"
+      }
+    },
+    {
+      key: "life-birth",
+      name: "生命诞生",
+      ageStartMyr: 600, ageEndMyr: 1500,
+      spanLabel: "6 ~ 15 亿年",
+      state: "微生物纪元",
+      lumLsun: 0.0000006, tempK: 420, radiusRsun: 0.0091,
+      color: "#22d07a", halo: "rgba(34,200,110,0.45)",
+      note: "约38亿年前，第一个能自我复制的分子诞生于热泉旁的浅海。微生物开始漫长地统治地球，蓝藻悄悄开始产氧。",
+      special: "earth-living",
+      teach: {
+        emoji: "🦠",
+        title: "生命点火：宇宙最大奇迹",
+        caption: "在某个深海热泉口，一个能复制自己的分子突然出现了——这就是生命的起点。此后20亿年，地球属于看不见的微生物世界。它们是无声的英雄，默默地改造着整个星球。"
+      }
+    },
+    {
+      key: "great-oxidation",
+      name: "大氧化事件",
+      ageStartMyr: 1500, ageEndMyr: 2500,
+      spanLabel: "15 ~ 25 亿年",
+      state: "大气演变",
+      lumLsun: 0.0000005, tempK: 320, radiusRsun: 0.0091,
+      color: "#a0e060", halo: "rgba(130,210,60,0.4)",
+      note: "蓝藻大规模产氧，大气氧含量从几乎为零升至约20%，引发大规模物种灭绝，也为复杂生命铺路。",
+      special: "earth-living",
+      teach: {
+        emoji: "💨",
+        title: "大氧化：微生物的「污染」事件",
+        caption: "蓝藻拼命呼出氧气，对当时的厌氧生物来说，这是毁灭性的「污染」——第一次大规模灭绝！但对未来的我们来说，这是馈赠。没有这一步，地球永远不会有动物，也不会有你。"
+      }
+    },
+    {
+      key: "complex-life",
+      name: "复杂生命",
+      ageStartMyr: 2500, ageEndMyr: 4000,
+      spanLabel: "25 ~ 40 亿年",
+      state: "多细胞生物",
+      lumLsun: 0.0000005, tempK: 290, radiusRsun: 0.0091,
+      color: "#60c8a0", halo: "rgba(80,190,140,0.4)",
+      note: "寒武纪大爆发（5.4亿年前）在极短时间内涌现几乎所有动物门类，恐龙繁荣后灭绝，哺乳动物崛起。",
+      special: "earth-living",
+      teach: {
+        emoji: "🦕",
+        title: "寒武纪大爆发：进化的\"大提速\"",
+        caption: "约5.4亿年前，复杂动物突然在地球上爆炸性出现——海洋里涌现出眼睛、嘴巴、腿……生命的创造力让人叹服。恐龙统治了1.6亿年，然后一颗小行星结束了它们，把地球让给了哺乳动物。"
+      }
+    },
+    {
+      key: "civilization",
+      name: "现代文明",
+      ageStartMyr: 4000, ageEndMyr: 4600,
+      spanLabel: "40 ~ 46 亿年（当下）",
+      state: "智慧文明",
+      lumLsun: 0.0000005, tempK: 288, radiusRsun: 0.0091,
+      color: "#4daaff", halo: "rgba(77,170,255,0.5)",
+      note: "智人出现约30万年，工业文明仅200年，却已改变大气成分、引发第六次大灭绝，并第一次向星空发出信号。",
+      special: "earth-living",
+      teach: {
+        emoji: "🌆",
+        title: "我们的时代：宇宙中的弹指一挥",
+        caption: "人类全部历史，在地球46亿年的时间轴上只是最末端的一个像素点。但我们点亮了城市，发射了旅行者号，把信号送入星际空间——第一个知道自己存在的物种，正在仰望自己的星。"
+      }
+    },
+    {
+      key: "desertification",
+      name: "地球沙漠化",
+      ageStartMyr: 4600, ageEndMyr: 5500,
+      spanLabel: "46 ~ 55 亿年",
+      state: "太阳膨胀辐射",
+      lumLsun: 0.0000003, tempK: 380, radiusRsun: 0.0091,
+      color: "#c87a30", halo: "rgba(200,110,40,0.45)",
+      note: "太阳亮度持续增加，地球表面温度超过液态水沸点，海洋蒸发殆尽，表面变成赤红色荒漠。文明已不复存在。",
+      special: "earth-relic",
+      teach: {
+        emoji: "🏜️",
+        title: "末日：海洋消失",
+        caption: "太阳越来越亮，地球开始失去海洋。先是浅海干涸，然后是深海，最后连大气中的水汽也在紫外线下被光解逃逸。不被太阳吞噬，但同样因太阳而死——只是以另一种方式。"
+      }
+    },
+    {
+      key: "relic",
+      name: "行星核遗迹",
+      ageStartMyr: 5500, ageEndMyr: 7000,
+      spanLabel: "55 ~ 70 亿年",
+      state: "大气逃逸",
+      lumLsun: 0.0000001, tempK: 120, radiusRsun: 0.0087,
+      color: "#445566", halo: "rgba(60,80,110,0.2)",
+      note: "大气和地壳挥发性物质基本逃逸，只剩下铁镍核心和致密岩质外壳，在太阳系外围静静漂流，宇宙冷却而终。",
+      special: "earth-relic",
+      teach: {
+        emoji: "🪨",
+        title: "遗迹：宇宙中最孤独的石头",
+        caption: "经历了46亿年的生机盎然、短暂的智慧文明，地球最终变成一块冰冷的岩石，在空旷的宇宙中默默漂流。没有海洋，没有大气，没有生命——但它曾经是宇宙中最特别的地方。"
+      }
+    }
+  ],
+  endingTitle: "终章：行星核遗迹",
+  endingDesc: "46亿年的蓝色星球，经历了岩浆、海洋、生命、文明，最终成为一块沉默的岩核，在宇宙中静静漂流。不被太阳吞噬，只是以更缓慢的方式，安静地消逝。",
+  endingBadge: "🪨 行星核遗迹",
+  endingNote: "💡 这是「乐观版本」——地球如果不被红巨星太阳吞噬，或者有技术文明将地球轨道推远，它的命运就是在几十亿年后以遗迹形式漂浮在宇宙中。而那个曾经的蓝色星球，只在时间轴上留下了一个不到1%宽度的生命窗口。",
+  quiz: [
+    { q: "地球的月亮是怎么来的？", a: "约45亿年前，一颗火星大小的天体「忒伊亚」撞上地球，撞出的碎片在地球轨道上聚合，形成了月球。这叫「大碰撞假说」。", ok: true, icon: "🌙" },
+    { q: "为什么说蓝藻「污染」了地球？", a: "蓝藻大量产氧，对当时的厌氧生物来说氧气是毒素，引发了地球历史上第一次大规模灭绝事件——「大氧化事件」，约24亿年前发生。", ok: true, icon: "🦠" },
+    { q: "人类在地球历史上占多大比例？", a: "地球约46亿岁，智人出现约30万年前，仅占地球历史的约0.007%——如果地球历史是1天，人类文明只出现在最后2秒钟！", ok: true, icon: "⏱️" }
+  ]
+};
+
+const STAR_CATALOG = [STAR_RED_DWARF, STAR_SUN, STAR_MASSIVE, EARTH];

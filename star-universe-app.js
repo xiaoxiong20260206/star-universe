@@ -78,6 +78,8 @@ function classifyPhase(phase) {
   if (phase.special === "ultra-wd") return "white-dwarf";
   if (phase.special === "blackdwarf") return "black-dwarf";
   if (phase.special === "blackhole") return "black-hole";
+  if (phase.special === "earth-living") return "earth-living";
+  if (phase.special === "earth-relic") return "earth-relic";
   if (key.includes("nebula") || key.includes("星云")) return "nebula";
   if (key.includes("white") || key.includes("白矮星")) return "white-dwarf";
   if (key.includes("black-hole") || key.includes("black hole") || key.includes("黑洞")) return "black-hole";
@@ -107,6 +109,8 @@ function getUnifiedVisualScale(star, phase) {
     critical: 86,
     supernova: 186,
     pisn: 208,
+    "earth-living": 90,
+    "earth-relic": 50,
   }[phaseClass] || 90;
 
   const factor = {
@@ -123,6 +127,8 @@ function getUnifiedVisualScale(star, phase) {
     critical: 1.0,
     supernova: 1.0,
     pisn: 1.0,
+    "earth-living": 1.0,
+    "earth-relic": 1.0,
   }[phaseClass] || 1;
 
   return Math.round(base * factor);
@@ -260,9 +266,9 @@ class UniverseStageCard {
 
     this.visual.style.background = `radial-gradient(circle at 50% 115%, rgba(74,106,255,0.14), transparent 42%), radial-gradient(circle at 50% 45%, ${phase.halo.replace(/0?\.\d+\)/, "0.16)")}, transparent 58%), #030611`;
 
-    this.core.style.opacity = phaseClass === "black-dwarf" ? "0.42" : phaseClass === "black-hole" ? "1" : "1";
-    this.halo.style.opacity = phaseClass === "black-dwarf" ? "0.12" : phaseClass === "white-dwarf" ? "0.65" : phaseClass === "black-hole" ? "0.3" : phaseClass === "pisn" ? "1" : "0.78";
-    this.haloOuter.style.opacity = phaseClass === "pisn" ? "0.85" : phaseClass === "nebula" ? "0.45" : phaseClass === "black-hole" ? "0.42" : "0.32";
+    this.core.style.opacity = phaseClass === "black-dwarf" ? "0.42" : phaseClass === "black-hole" ? "1" : phaseClass === "earth-relic" ? "0.75" : "1";
+    this.halo.style.opacity = phaseClass === "black-dwarf" ? "0.12" : phaseClass === "white-dwarf" ? "0.65" : phaseClass === "black-hole" ? "0.3" : phaseClass === "pisn" ? "1" : phaseClass === "earth-living" ? "0.5" : phaseClass === "earth-relic" ? "0.08" : "0.78";
+    this.haloOuter.style.opacity = phaseClass === "pisn" ? "0.85" : phaseClass === "nebula" ? "0.45" : phaseClass === "black-hole" ? "0.42" : phaseClass === "earth-relic" ? "0.04" : "0.32";
 
     this.blackHoleRing.style.opacity = phaseClass === "black-hole" ? "1" : "0";
     this.blackHoleDisk.style.opacity = phaseClass === "black-hole" ? "1" : "0";
@@ -301,6 +307,21 @@ class UniverseStageCard {
     } else if (phaseClass === "giant" || phaseClass === "supergiant") {
       this.core.style.background = `radial-gradient(circle at 35% 30%, #fff0d6 0%, ${color} 46%, #3a0d02 100%)`;
       this.core.style.boxShadow = `0 0 ${Math.round(size * 0.85)}px ${phase.halo}, 0 0 ${Math.round(size * 1.8)}px rgba(255,120,80,0.14)`;
+    } else if (phaseClass === "earth-living") {
+      // Blue-green planet with swirling continent shimmer
+      const isProto = phase.key === "proto-earth";
+      if (isProto) {
+        this.core.style.background = `radial-gradient(circle at 42% 38%, #fff0c0 0%, #ff8040 30%, #b03010 65%, #3a0808 100%)`;
+        this.core.style.boxShadow = `0 0 ${Math.round(size * 1.1)}px rgba(255,120,50,0.75), 0 0 ${Math.round(size * 2.0)}px rgba(255,70,20,0.22)`;
+      } else {
+        this.core.style.background = `radial-gradient(circle at 38% 34%, #b0e4ff 0%, #4daaff 28%, #1a6a30 56%, #0a1e50 100%)`;
+        this.core.style.boxShadow = `0 0 ${Math.round(size * 0.9)}px rgba(77,170,255,0.7), 0 0 ${Math.round(size * 1.8)}px rgba(34,200,110,0.18)`;
+      }
+      this.core.classList.add("earth-core");
+    } else if (phaseClass === "earth-relic") {
+      this.core.style.background = `radial-gradient(circle at 42% 38%, #88775a 0%, #554433 45%, #2a1f18 80%, #0a0806 100%)`;
+      this.core.style.boxShadow = `0 0 ${Math.round(size * 0.4)}px rgba(100,80,60,0.35)`;
+      this.core.classList.remove("earth-core");
     } else if (phaseClass === "cloud") {
       this.core.style.background = `radial-gradient(circle, rgba(255,255,255,0.18) 0%, ${color} 38%, rgba(255,180,120,0.14) 66%, transparent 100%)`;
       this.core.style.boxShadow = `0 0 ${Math.round(size * 0.95)}px ${phase.halo}`;
@@ -326,7 +347,7 @@ class UniverseStageCard {
 class StarUniverseApp {
   constructor() {
     this.catalog = [...STAR_CATALOG, STAR_100M, STAR_250M];
-    this.selected = new Set(["red-dwarf", "sun", "massive", "black-hole", "extreme"]);
+    this.selected = new Set(["red-dwarf", "sun", "massive", "black-hole", "extreme", "earth"]);
     this.focusKey = "sun";
     this.progress = 0;
     this.speed = 1;
@@ -429,7 +450,7 @@ class StarUniverseApp {
     if (selectedStars.length === 1) {
       columns = 1;
     } else if (width >= 1180) {
-      columns = Math.min(selectedStars.length, 5);
+      columns = Math.min(selectedStars.length, 6);
     } else if (width >= 820) {
       columns = Math.min(selectedStars.length, 3);
     } else {
