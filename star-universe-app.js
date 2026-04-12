@@ -434,6 +434,11 @@ class StarUniverseApp {
     this.audioEnabled = true;
     this.speechSupported = typeof window !== "undefined" && "speechSynthesis" in window && typeof window.SpeechSynthesisUtterance !== "undefined";
     this.lastNarratedPhaseKey = null;
+    
+    // 阶段停留控制
+    this.phaseStartMs = Date.now();
+    this.lastPhaseIdx = -1;
+    this.minPhaseHoldMs = 3500; // 每阶段最小停留 3.5 秒
 
     this.bindEls();
     this.updateAudioToggleUI();
@@ -661,15 +666,53 @@ class StarUniverseApp {
     if (value) this.rafId = requestAnimationFrame(() => this.tick());
   }
 
+  getCurrentPhaseIdx() {
+    const focusObj = this.catalog.find(s => s.key === this.focusKey);
+    if (!focusObj) return -1;
+    const ranges = buildRanges(focusObj.phases);
+    return getPhaseIdx(ranges, this.progress);
+  }
+
   tick() {
     if (!this.playing) return;
-    this.progress = Math.min(MAX_PROGRESS, this.progress + this.speed * 1.2);
+    
+    const now = Date.now();
+    const phaseIdx = this.getCurrentPhaseIdx();
+    
+    // 检测阶段变化
+    if (phaseIdx !== this.lastPhaseIdx) {
+      this.lastPhaseIdx = phaseIdx;
+      this.phaseStartMs = now;
+    }
+    
+    // 计算已停留时间
+    const elapsed = now - this.phaseStartMs;
+    // 速度档位影响停留时长：慢速=2倍停留，快速=0.5倍，极速=0.25倍
+    const speedHoldFactor = this.speed <= 1 ? (2 - this.speed) : (1 / this.speed);
+    const minHold = this.minPhaseHoldMs * speedHoldFactor;
+    
+    // 如果还没达到最小停留时间，继续等待
+    if (elapsed < minHold) {
+      this.rafId = requestAnimationFrame(() => this.tick());
+      return;
+    }
+    
+    // 如果开启了语音，等待语音播完
+    if (this.audioEnabled && this.speechSupported && window.speechSynthesis.speaking) {
+      this.rafId = requestAnimationFrame(() => this.tick());
+      return;
+    }
+    
+    // 满足停留时间且语音播完，推进进度
+    this.progress = Math.min(MAX_PROGRESS, this.progress + this.speed * 0.5);
     this.progressBar.value = String(this.progress);
     this.render();
+    
     if (this.progress >= MAX_PROGRESS) {
       this.setPlaying(false);
       return;
     }
+    
     this.rafId = requestAnimationFrame(() => this.tick());
   }
 
