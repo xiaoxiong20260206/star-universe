@@ -481,9 +481,22 @@ class StarUniverseApp {
   }
 
   getSelectedStars() {
+    const getAbsoluteMass = (item) => {
+      // Normalize to solar masses: planets use Earth masses (M⊕), stars use solar masses (M☉)
+      // 1 M⊕ ≈ 3.003e-6 M☉
+      return item.category === "planet" ? item.massRatio * 3.003e-6 : item.massRatio;
+    };
+
     return this.catalog
       .filter((item) => this.selected.has(item.key))
-      .sort((a, b) => a.massRatio - b.massRatio);
+      .sort((a, b) => {
+        // Sort by category first: planets before stars
+        if (a.category !== b.category) {
+          return a.category === "planet" ? -1 : 1;
+        }
+        // Within same category, sort by mass (ascending)
+        return getAbsoluteMass(a) - getAbsoluteMass(b);
+      });
   }
 
   ensureFocusVisible() {
