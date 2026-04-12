@@ -1184,3 +1184,10 @@ const PLANET_NEPTUNE = {
 // 注意：STAR_100M 和 STAR_250M 在 star-250m-data.js 中定义，
 // catalog 的组装移到 star-universe-app.js 的构造函数中，
 // 以避免脚本加载顺序导致的 ReferenceError。
+
+// ============================================================
+// Backward compatibility for star-compare.html + star-engine.js
+// star-engine.js expects STAR_CATALOG (lines 251, 311, 365, 428, 431, 469)
+// star-compare.html only loads star-data.js + star-engine.js
+// ============================================================
+const STAR_CATALOG = [STAR_RED_DWARF, STAR_SUN, STAR_MASSIVE];
