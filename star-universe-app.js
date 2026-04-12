@@ -92,39 +92,30 @@ function classifyPhase(phase) {
 
 function getUnifiedVisualScale(star, phase, selectedCount = 6) {
   // -------------------------------------------------------
-  // 统一比例尺：大的星看起来真的大，小的真的小。
-  //
-  // 核心公式（恒星）：size = BASE × massFactor × stageMultiplier
-  //   BASE      = 60px（太阳主序锚点）
-  //   massFactor = massRatio ^ 0.28   （太阳=1.0 → 60px）
-  //   stageMultiplier：阶段放大系数（超巨星≈2.2倍主序，星云≈2.8倍…）
-  //
-  // 预期主序大小层级（从小到大）：
-  //   地球(5px) < 红矮星(31px) < 太阳(60px) < 8M☉(107px) < 100M☉+(上限200px)
-  //
-  // 致密天体（白矮星/黑矮星/中子星/黑洞）和地球：固定尺寸，不随质量因子缩放。
+  // 统一比例尺 + 自适应放大：
+  // 1) 多星同屏(>=5): 严格统一比例，便于比较
+  // 2) 少星聚焦(1~2): 显著放大，提升可读性
   // -------------------------------------------------------
 
   const phaseClass = classifyPhase(phase);
   const m = Math.max(star.massRatio, 0.000001);
 
-  // 各阶段相对于主序的尺寸倍率
   const stageMultiplier = {
-    cloud:           0.80,
-    protostar:       0.88,
+    cloud: 0.80,
+    protostar: 0.88,
     "main-sequence": 1.00,
-    giant:           1.70,
-    supergiant:      2.20,
-    nebula:          2.80,
-    "white-dwarf":   0.20,  // 固定，不随质量缩放
-    "black-dwarf":   0.15,  // 固定
-    compact:         0.15,  // 固定（中子星/脉冲星）
-    "black-hole":    0.22,  // 固定
-    critical:        1.05,
-    supernova:       2.60,
-    pisn:            3.00,
-    "earth-living":  0.08,  // 地球远小于恒星，视觉固定≈5px
-    "earth-relic":   0.06,
+    giant: 1.70,
+    supergiant: 2.20,
+    nebula: 2.80,
+    "white-dwarf": 0.20,
+    "black-dwarf": 0.15,
+    compact: 0.15,
+    "black-hole": 0.22,
+    critical: 1.05,
+    supernova: 2.60,
+    pisn: 3.00,
+    "earth-living": 0.08,
+    "earth-relic": 0.06,
   }[phaseClass] ?? 1.0;
 
   const BASE = 60;
@@ -132,33 +123,43 @@ function getUnifiedVisualScale(star, phase, selectedCount = 6) {
   const viewZoomFactor = selectedCount >= 5
     ? 1.00
     : selectedCount === 4
-      ? 1.08
+      ? 1.12
       : selectedCount === 3
-        ? 1.16
+        ? 1.28
         : selectedCount === 2
-          ? 1.28
-          : 1.42;
+          ? 1.62
+          : 2.20;
 
-  // 致密天体和地球：固定尺寸，不乘质量因子
   const isFixed = [
     "white-dwarf", "black-dwarf", "compact", "black-hole",
     "earth-living", "earth-relic",
   ].includes(phaseClass);
 
   if (isFixed) {
-    const fixedSize = BASE * stageMultiplier * viewZoomFactor;
-    const minSize = phaseClass === "earth-living" ? 6 : 4;
-    const maxSize = phaseClass === "earth-living" ? 14 : 22;
+    let fixedSize = BASE * stageMultiplier * viewZoomFactor;
+
+    if (phaseClass === "earth-living" && selectedCount === 1) {
+      fixedSize *= 1.45;
+    }
+
+    const minSize = phaseClass === "earth-living" ? 8 : 5;
+
+    const maxSize = phaseClass === "earth-living"
+      ? (selectedCount === 1 ? 42 : selectedCount <= 2 ? 30 : 18)
+      : phaseClass === "earth-relic"
+        ? (selectedCount <= 2 ? 22 : 14)
+        : (selectedCount <= 2 ? 30 : 20);
+
     return Math.round(Math.min(maxSize, Math.max(minSize, fixedSize)));
   }
 
-  // 恒星：幂律质量因子，指数 0.28（对数压缩，太阳=1.0基准）
   const massFactor = Math.pow(m, 0.28);
-
   const raw = BASE * massFactor * stageMultiplier;
   const zoomed = raw * viewZoomFactor;
-  // 多星同屏保持统一比例，少量天体时自动放大
-  return Math.round(Math.min(200, Math.max(10, zoomed)));
+
+  const maxSize = selectedCount === 1 ? 320 : selectedCount === 2 ? 260 : 200;
+
+  return Math.round(Math.min(maxSize, Math.max(10, zoomed)));
 }
 
 function createBackgroundStars(container) {
@@ -269,7 +270,8 @@ class UniverseStageCard {
     const color = mixColor(phase.color, next.color, t * 0.35);
     const phaseClass = classifyPhase(phase);
 
-    const size = getUnifiedVisualScale(this.star, phase, window.starUniverseApp?.selected?.size || 6);
+    const selectedCount = window.starUniverseApp?.selected?.size || 6;
+    const size = getUnifiedVisualScale(this.star, phase, selectedCount);
     const haloSize = Math.round(size * (phaseClass === "nebula" ? 2.2 : phaseClass === "pisn" ? 2.8 : 2.05));
     const haloOuterSize = Math.round(haloSize * 1.28);
 
