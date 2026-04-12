@@ -445,6 +445,18 @@ body {
   box-shadow: 0 10px 30px rgba(82, 115, 255, 0.22);
 }
 
+.action-btn.muted {
+  color: #b8c7e8;
+  border-color: rgba(180, 205, 255, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: none;
+}
+
+.action-btn.disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .speed-box {
   display: flex;
   align-items: center;
@@ -623,7 +635,7 @@ body {
 
 .stage-visual {
   position: relative;
-  min-height: 168px;
+  min-height: 188px;
   overflow: hidden;
   background:
     radial-gradient(circle at 50% 110%, rgba(74, 106, 255, 0.18), transparent 42%),
@@ -869,7 +881,7 @@ body {
   .info-grid { grid-template-columns: 1fr; }
   .section-head { flex-direction: column; align-items: flex-start; }
   .selection-hint { text-align: left; }
-  .stage-visual { min-height: 140px; }
+  .stage-visual { min-height: 160px; }
   .stage-progress-head,
   .progress-labels { flex-direction: column; align-items: flex-start; }
   .compact-insight,

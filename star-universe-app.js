@@ -387,7 +387,12 @@ class StarUniverseApp {
     this.endingShown = false;
     this.quizOpen = false;
 
+    this.audioEnabled = true;
+    this.speechSupported = typeof window !== "undefined" && "speechSynthesis" in window && typeof window.SpeechSynthesisUtterance !== "undefined";
+    this.lastNarratedPhaseKey = null;
+
     this.bindEls();
+    this.updateAudioToggleUI();
     createBackgroundStars(this.starsLayer);
     this.renderSelector();
     this.renderStage();
@@ -401,6 +406,7 @@ class StarUniverseApp {
     this.playBtn = document.getElementById("playBtn");
     this.resetBtn = document.getElementById("resetBtn");
     this.quizToggleBtn = document.getElementById("quizToggleBtn");
+    this.audioToggleBtn = document.getElementById("audioToggleBtn");
     this.speedSelect = document.getElementById("speedSelect");
     this.progressBar = document.getElementById("progressBar");
     this.selectAllBtn = document.getElementById("selectAllBtn");
@@ -506,6 +512,8 @@ class StarUniverseApp {
 
   setFocus(key) {
     if (!this.selected.has(key)) this.selected.add(key);
+    this.stopNarration();
+    this.lastNarratedPhaseKey = null;
     this.focusKey = key;
     this.renderSelector();
     this.renderStage();
@@ -514,6 +522,8 @@ class StarUniverseApp {
 
   focusOnly(key) {
     this.selected = new Set([key]);
+    this.stopNarration();
+    this.lastNarratedPhaseKey = null;
     this.focusKey = key;
     this.renderSelector();
     this.renderStage();
@@ -527,6 +537,8 @@ class StarUniverseApp {
     } else {
       this.selected.add(key);
     }
+    this.stopNarration();
+    this.lastNarratedPhaseKey = null;
     this.ensureFocusVisible();
     this.renderSelector();
     this.renderStage();
@@ -536,6 +548,7 @@ class StarUniverseApp {
   setPlaying(value) {
     this.playing = value;
     this.playBtn.textContent = value ? "⏸ 暂停" : "▶ 播放";
+    if (!value) this.stopNarration();
     cancelAnimationFrame(this.rafId);
     if (value) this.rafId = requestAnimationFrame(() => this.tick());
   }
@@ -576,6 +589,64 @@ class StarUniverseApp {
     this.endingOverlay.classList.remove("visible");
   }
 
+  updateAudioToggleUI() {
+    if (!this.audioToggleBtn) return;
+    if (!this.speechSupported) {
+      this.audioToggleBtn.textContent = "🔇 语音不可用";
+      this.audioToggleBtn.classList.add("disabled");
+      this.audioToggleBtn.classList.remove("active", "muted");
+      this.audioToggleBtn.disabled = true;
+      return;
+    }
+
+    this.audioToggleBtn.disabled = false;
+    this.audioToggleBtn.classList.remove("disabled");
+    this.audioToggleBtn.classList.toggle("active", this.audioEnabled);
+    this.audioToggleBtn.classList.toggle("muted", !this.audioEnabled);
+    this.audioToggleBtn.textContent = this.audioEnabled ? "🔊 讲解开" : "🔈 讲解关";
+  }
+
+  stopNarration() {
+    if (!this.speechSupported) return;
+    window.speechSynthesis.cancel();
+  }
+
+  buildNarrationText(result) {
+    const { phase, idx } = result;
+    const title = phase.teach?.title || phase.name;
+    const caption = phase.teach?.caption || phase.note || "";
+    const firstSentence = caption
+      .split(/[。！？!?]/)
+      .map((item) => item.trim())
+      .filter(Boolean)[0] || caption;
+    return `第${idx + 1}阶段，${title}。${firstSentence}`;
+  }
+
+  speakNarration(text) {
+    if (!this.speechSupported || !text) return;
+    this.stopNarration();
+    const utterance = new window.SpeechSynthesisUtterance(text);
+    utterance.lang = "zh-CN";
+    utterance.rate = 1.02;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+    window.speechSynthesis.speak(utterance);
+  }
+
+  maybeNarrateEarthPhase(result) {
+    if (!result || !this.playing || !this.audioEnabled || !this.speechSupported) return;
+    if (this.focusKey !== "earth" || result.star.key !== "earth") return;
+
+    const phaseKey = result.phase?.key;
+    if (!phaseKey) return;
+
+    const narrationKey = `${result.star.key}:${phaseKey}`;
+    if (this.lastNarratedPhaseKey === narrationKey) return;
+
+    this.lastNarratedPhaseKey = narrationKey;
+    this.speakNarration(this.buildNarrationText(result));
+  }
+
   renderQuiz(star) {
     if (!star || !this.quizSection) return;
     const quizList = Array.isArray(star.quiz) ? star.quiz : [];
@@ -609,7 +680,9 @@ class StarUniverseApp {
   updateFocusSummary(result) {
     const { star, phase, age, phaseClass } = result;
     const selectedCount = this.selected.size;
-    this.stageTitle.textContent = selectedCount === 1 ? `${star.name} · 单星聚焦模式` : `${selectedCount} 颗恒星 · 同屏比较模式`;
+    this.stageTitle.textContent = selectedCount === 1
+      ? `${star.name} · 单星聚焦模式（自动放大）`
+      : `${selectedCount} 颗恒星 · 同屏比较模式（统一比例尺）`;
     this.selectionHint.textContent = selectedCount === 1
       ? "双击其他星卡可切换焦点；单击星卡可重新加入比较。"
       : `当前焦点：${star.name} · 已按质量从小到大排列，可直接拖动上方时间轴`;
@@ -638,6 +711,7 @@ class StarUniverseApp {
       this.progressBar.value = "0";
       this.endingShown = false;
       this.hideEnding();
+      this.lastNarratedPhaseKey = null;
       this.setPlaying(false);
       this.render();
     });
@@ -646,6 +720,8 @@ class StarUniverseApp {
     });
     this.progressBar.addEventListener("input", (event) => {
       this.progress = Number(event.target.value);
+      this.lastNarratedPhaseKey = null;
+      this.stopNarration();
       if (this.progress < MAX_PROGRESS) {
         this.endingShown = false;
         this.hideEnding();
@@ -654,6 +730,8 @@ class StarUniverseApp {
     });
     this.selectAllBtn.addEventListener("click", () => {
       this.selected = new Set(this.catalog.map((item) => item.key));
+      this.stopNarration();
+      this.lastNarratedPhaseKey = null;
       this.renderSelector();
       this.renderStage();
       this.render();
@@ -661,6 +739,23 @@ class StarUniverseApp {
     this.showFocusBtn.addEventListener("click", () => {
       this.focusOnly(this.focusKey);
     });
+
+    if (this.audioToggleBtn) {
+      this.audioToggleBtn.addEventListener("click", () => {
+        if (!this.speechSupported) {
+          this.updateAudioToggleUI();
+          return;
+        }
+        this.audioEnabled = !this.audioEnabled;
+        if (!this.audioEnabled) {
+          this.stopNarration();
+        } else {
+          this.lastNarratedPhaseKey = null;
+          this.render();
+        }
+        this.updateAudioToggleUI();
+      });
+    }
 
     if (this.quizToggleBtn) {
       this.quizToggleBtn.addEventListener("click", () => {
@@ -715,9 +810,14 @@ class StarUniverseApp {
 
     if (focusResult) {
       this.updateFocusSummary(focusResult);
+      this.maybeNarrateEarthPhase(focusResult);
       if (this.quizOpen) {
         this.renderQuiz(focusResult.star);
       }
+    }
+
+    if (!focusResult || focusResult.star.key !== "earth" || !this.playing) {
+      this.stopNarration();
     }
 
     if (this.progress >= MAX_PROGRESS && !this.endingShown && focusResult) {
