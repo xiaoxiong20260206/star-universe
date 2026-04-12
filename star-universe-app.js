@@ -90,7 +90,7 @@ function classifyPhase(phase) {
   return "main-sequence";
 }
 
-function getUnifiedVisualScale(star, phase) {
+function getUnifiedVisualScale(star, phase, selectedCount = 6) {
   // -------------------------------------------------------
   // 统一比例尺：大的星看起来真的大，小的真的小。
   //
@@ -127,8 +127,17 @@ function getUnifiedVisualScale(star, phase) {
     "earth-relic":   0.06,
   }[phaseClass] ?? 1.0;
 
-  // 主序锚点像素：太阳(1 M☉)主序 = 60px
   const BASE = 60;
+
+  const viewZoomFactor = selectedCount >= 5
+    ? 1.00
+    : selectedCount === 4
+      ? 1.08
+      : selectedCount === 3
+        ? 1.16
+        : selectedCount === 2
+          ? 1.28
+          : 1.42;
 
   // 致密天体和地球：固定尺寸，不乘质量因子
   const isFixed = [
@@ -137,15 +146,19 @@ function getUnifiedVisualScale(star, phase) {
   ].includes(phaseClass);
 
   if (isFixed) {
-    return Math.round(Math.max(4, BASE * stageMultiplier));
+    const fixedSize = BASE * stageMultiplier * viewZoomFactor;
+    const minSize = phaseClass === "earth-living" ? 6 : 4;
+    const maxSize = phaseClass === "earth-living" ? 14 : 22;
+    return Math.round(Math.min(maxSize, Math.max(minSize, fixedSize)));
   }
 
   // 恒星：幂律质量因子，指数 0.28（对数压缩，太阳=1.0基准）
   const massFactor = Math.pow(m, 0.28);
 
   const raw = BASE * massFactor * stageMultiplier;
-  // 限制在 [10, 200] px 范围
-  return Math.round(Math.min(200, Math.max(10, raw)));
+  const zoomed = raw * viewZoomFactor;
+  // 多星同屏保持统一比例，少量天体时自动放大
+  return Math.round(Math.min(200, Math.max(10, zoomed)));
 }
 
 function createBackgroundStars(container) {
@@ -256,7 +269,7 @@ class UniverseStageCard {
     const color = mixColor(phase.color, next.color, t * 0.35);
     const phaseClass = classifyPhase(phase);
 
-    const size = getUnifiedVisualScale(this.star, phase);
+    const size = getUnifiedVisualScale(this.star, phase, window.starUniverseApp?.selected?.size || 6);
     const haloSize = Math.round(size * (phaseClass === "nebula" ? 2.2 : phaseClass === "pisn" ? 2.8 : 2.05));
     const haloOuterSize = Math.round(haloSize * 1.28);
 
