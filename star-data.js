@@ -491,7 +491,7 @@ const EARTH = {
   key: "earth",
   name: "地球",
   massLabel: "🌍 地球",
-  massRatio: 0.000003,
+  massRatio: 1.0, // 1.0 M⊕ (Earth masses), consistent with other planets
   themeColor: "#4daaff",
   gradientFrom: "#4daaff",
   gradientTo: "#1a5a2f",
