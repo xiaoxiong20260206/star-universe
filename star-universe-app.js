@@ -91,47 +91,61 @@ function classifyPhase(phase) {
 }
 
 function getUnifiedVisualScale(star, phase) {
+  // -------------------------------------------------------
+  // 统一比例尺：大的星看起来真的大，小的真的小。
+  //
+  // 核心公式（恒星）：size = BASE × massFactor × stageMultiplier
+  //   BASE      = 60px（太阳主序锚点）
+  //   massFactor = massRatio ^ 0.28   （太阳=1.0 → 60px）
+  //   stageMultiplier：阶段放大系数（超巨星≈2.2倍主序，星云≈2.8倍…）
+  //
+  // 预期主序大小层级（从小到大）：
+  //   地球(5px) < 红矮星(31px) < 太阳(60px) < 8M☉(107px) < 100M☉+(上限200px)
+  //
+  // 致密天体（白矮星/黑矮星/中子星/黑洞）和地球：固定尺寸，不随质量因子缩放。
+  // -------------------------------------------------------
+
   const phaseClass = classifyPhase(phase);
-  const massRatio = star.massRatio;
-  const massBias = Math.min(1.25, Math.max(0.82, Math.log10(massRatio + 1) / 1.6 + 0.8));
+  const m = Math.max(star.massRatio, 0.000001);
 
-  const base = {
-    cloud: 58,
-    protostar: 72,
-    "main-sequence": 88,
-    giant: 128,
-    supergiant: 148,
-    nebula: 174,
-    "white-dwarf": 30,
-    "black-dwarf": 20,
-    compact: 18,
-    "black-hole": 28,
-    critical: 86,
-    supernova: 186,
-    pisn: 208,
-    "earth-living": 90,
-    "earth-relic": 50,
-  }[phaseClass] || 90;
+  // 各阶段相对于主序的尺寸倍率
+  const stageMultiplier = {
+    cloud:           0.80,
+    protostar:       0.88,
+    "main-sequence": 1.00,
+    giant:           1.70,
+    supergiant:      2.20,
+    nebula:          2.80,
+    "white-dwarf":   0.20,  // 固定，不随质量缩放
+    "black-dwarf":   0.15,  // 固定
+    compact:         0.15,  // 固定（中子星/脉冲星）
+    "black-hole":    0.22,  // 固定
+    critical:        1.05,
+    supernova:       2.60,
+    pisn:            3.00,
+    "earth-living":  0.08,  // 地球远小于恒星，视觉固定≈5px
+    "earth-relic":   0.06,
+  }[phaseClass] ?? 1.0;
 
-  const factor = {
-    cloud: 1.02,
-    protostar: 1.04,
-    "main-sequence": massBias,
-    giant: 1.0,
-    supergiant: 1.0,
-    nebula: 1.0,
-    "white-dwarf": 1.0,
-    "black-dwarf": 1.0,
-    compact: 1.0,
-    "black-hole": 1.0,
-    critical: 1.0,
-    supernova: 1.0,
-    pisn: 1.0,
-    "earth-living": 1.0,
-    "earth-relic": 1.0,
-  }[phaseClass] || 1;
+  // 主序锚点像素：太阳(1 M☉)主序 = 60px
+  const BASE = 60;
 
-  return Math.round(base * factor);
+  // 致密天体和地球：固定尺寸，不乘质量因子
+  const isFixed = [
+    "white-dwarf", "black-dwarf", "compact", "black-hole",
+    "earth-living", "earth-relic",
+  ].includes(phaseClass);
+
+  if (isFixed) {
+    return Math.round(Math.max(4, BASE * stageMultiplier));
+  }
+
+  // 恒星：幂律质量因子，指数 0.28（对数压缩，太阳=1.0基准）
+  const massFactor = Math.pow(m, 0.28);
+
+  const raw = BASE * massFactor * stageMultiplier;
+  // 限制在 [10, 200] px 范围
+  return Math.round(Math.min(200, Math.max(10, raw)));
 }
 
 function createBackgroundStars(container) {
