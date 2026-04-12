@@ -409,7 +409,17 @@ class UniverseStageCard {
 
 class StarUniverseApp {
   constructor() {
-    this.catalog = SOLAR_SYSTEM_CATALOG;
+    // 在运行时组装 catalog（所有脚本已加载，STAR_100M/STAR_250M 已定义）
+    const PLANETS = [PLANET_MERCURY, PLANET_VENUS, EARTH, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE];
+    const STARS = [STAR_RED_DWARF, STAR_SUN, STAR_MASSIVE, STAR_100M, STAR_250M];
+    
+    // 为所有对象添加 category 字段
+    PLANETS.forEach(p => p.category = "planet");
+    STARS.forEach(s => s.category = "star");
+    
+    // 完整目录：行星在前，恒星在后
+    this.catalog = [...PLANETS, ...STARS];
+    
     this.selected = new Set(["mercury", "venus", "earth", "mars", "jupiter", "saturn", "uranus", "neptune"]);
     this.focusKey = "earth";
     this.progress = 0;
@@ -814,7 +824,8 @@ class StarUniverseApp {
       this.render();
     });
     this.selectAllBtn.addEventListener("click", () => {
-      this.selected = new Set(this.catalog.map((item) => item.key));
+      // 全选行星（不包括恒星）
+      this.selected = new Set(this.catalog.filter(item => item.category === "planet").map(item => item.key));
       this.stopNarration();
       this.lastNarratedPhaseKey = null;
       this.renderSelector();

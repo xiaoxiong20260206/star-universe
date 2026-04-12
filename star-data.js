@@ -1179,19 +1179,8 @@ const PLANET_NEPTUNE = {
 };
 
 // ============================================================
-// 6. 分组目录 — 太阳系行星 + 恒星演化对比
+// 6. 分组目录 — 由 star-universe-app.js 在运行时组装
 // ============================================================
-
-const PLANETS = [PLANET_MERCURY, PLANET_VENUS, EARTH, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE];
-
-const STARS = [STAR_RED_DWARF, STAR_SUN, STAR_MASSIVE, STAR_100M, STAR_250M];
-
-// 为所有对象添加 category 字段
-PLANETS.forEach(p => p.category = "planet");
-STARS.forEach(s => s.category = "star");
-
-// 完整目录：行星在前，恒星在后
-const SOLAR_SYSTEM_CATALOG = [...PLANETS, ...STARS];
-
-// 保留旧名兼容
-const STAR_CATALOG = SOLAR_SYSTEM_CATALOG;
+// 注意：STAR_100M 和 STAR_250M 在 star-250m-data.js 中定义，
+// catalog 的组装移到 star-universe-app.js 的构造函数中，
+// 以避免脚本加载顺序导致的 ReferenceError。
