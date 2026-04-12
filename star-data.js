@@ -640,4 +640,558 @@ const EARTH = {
   ]
 };
 
-const STAR_CATALOG = [STAR_RED_DWARF, STAR_SUN, STAR_MASSIVE, EARTH];
+// ============================================================
+// 5. 太阳系行星 — 水星到海王星（简化的演化阶段）
+// ============================================================
+
+const PLANET_MERCURY = {
+  key: "mercury",
+  name: "水星",
+  massLabel: "0.055 M⊕",
+  massRatio: 0.055,
+  category: "planet",
+  themeColor: "#b8b8b8",
+  gradientFrom: "#d0d0d0",
+  gradientTo: "#606060",
+  summary: "太阳系最小、离太阳最近的行星，一天比一年还长。",
+  funFact: "水星表面温差可达600°C！白天430°C，夜晚-180°C。",
+  fate: "🔥 被太阳吞噬",
+  fateColor: "#ff8844",
+  phases: [
+    {
+      key: "formation",
+      name: "形成期",
+      ageStartMyr: 0, ageEndMyr: 10,
+      spanLabel: "0 ~ 1000 万年",
+      state: "原行星吸积",
+      lumLsun: 0.00000001, tempK: 1500, radiusRsun: 0.0038,
+      color: "#ff9966", halo: "rgba(255,140,90,0.4)",
+      note: "从太阳系尘盘中吸积成形，离太阳最近，原始大气很快被太阳风吹散。",
+      teach: {
+        emoji: "🔥",
+        title: "水星的诞生：在烈火旁成长",
+        caption: "水星形成于太阳系最内圈，承受着最猛烈的太阳风和辐射。它的原始大气层很快被剥离，只剩下一个裸露的岩石核心。从诞生起，它就是一颗「裸奔」的行星。"
+      }
+    },
+    {
+      key: "stable",
+      name: "稳定期",
+      ageStartMyr: 10, ageEndMyr: 8000,
+      spanLabel: "1000万 ~ 80 亿年",
+      state: "极端温差行星",
+      lumLsun: 0.00000001, tempK: 440, radiusRsun: 0.0038,
+      color: "#a8a8a8", halo: "rgba(150,150,150,0.25)",
+      note: "自转周期59天，公转周期88天，导致表面昼夜温差极大。",
+      teach: {
+        emoji: "☀️",
+        title: "双重极端：白天炼狱，夜晚冰窖",
+        caption: "水星的一天比一年还长！自转极慢，一面烤了88天太阳，另一面则沉入-180°C的黑夜。表面布满陨石坑，没有任何大气保护。这是太阳系温差最大的地方。"
+      }
+    },
+    {
+      key: "engulfed",
+      name: "太阳膨胀吞噬",
+      ageStartMyr: 8000, ageEndMyr: 12000,
+      spanLabel: "80 ~ 120 亿年",
+      state: "被红巨星吞噬",
+      lumLsun: 0.0000001, tempK: 2000, radiusRsun: 0.0038,
+      color: "#ff6644", halo: "rgba(255,80,40,0.6)",
+      note: "太阳进入红巨星阶段，水星第一个被吞没，化为太阳大气的离子。",
+      special: "earth-relic",
+      teach: {
+        emoji: "🔥",
+        title: "终章：第一个消失的行星",
+        caption: "当太阳膨胀成红巨星时，水星首当其冲。它被太阳外层大气完全吞没，在数千年内被蒸发殆尽。距离太阳最近，也最先消失——水星的命运，就是离太阳太近的代价。"
+      }
+    }
+  ],
+  endingTitle: "终章：被红巨星太阳吞噬",
+  endingDesc: "离太阳最近，也最先消失。水星在太阳红巨星阶段被完全吞没，化为离子气体，成为太阳大气的一部分。",
+  endingBadge: "🔥 水星终结",
+  endingNote: "💡 水星是第一个被红巨星太阳吞噬的行星，之后依次是金星、地球。火星可能存活，气态巨行星则可能被推远。",
+  quiz: [
+    { q: "水星的一天比一年长吗？", a: "是的！水星自转周期约59天，公转周期约88天，自转比公转慢！", ok: true, icon: "🔄" },
+    { q: "水星有大气层吗？", a: "几乎没有。太阳风把原始大气全部吹跑了，只剩极稀薄的外逸层。", ok: false, icon: "💨" },
+    { q: "水星为什么温差这么大？", a: "因为几乎没有大气保温，加上自转极慢，向阳面持续暴晒，背阳面长期黑暗。", ok: true, icon: "🌡️" }
+  ]
+};
+
+const PLANET_VENUS = {
+  key: "venus",
+  name: "金星",
+  massLabel: "0.815 M⊕",
+  massRatio: 0.815,
+  category: "planet",
+  themeColor: "#ffcc66",
+  gradientFrom: "#ffe080",
+  gradientTo: "#cc8833",
+  summary: "地球的「姐妹星」，却是太阳系最热的地方——失控温室效应的教科书。",
+  funFact: "金星的一天比水星还长！自转243天，公转225天，而且是倒着转。",
+  fate: "🔥 被太阳吞噬",
+  fateColor: "#ff8844",
+  phases: [
+    {
+      key: "formation",
+      name: "形成期",
+      ageStartMyr: 0, ageEndMyr: 10,
+      spanLabel: "0 ~ 1000 万年",
+      state: "原行星吸积",
+      lumLsun: 0.00000001, tempK: 1200, radiusRsun: 0.0095,
+      color: "#ffbb55", halo: "rgba(255,180,80,0.45)",
+      note: "从太阳系尘盘中成形，离太阳较近，可能曾有过液态水海洋。",
+      teach: {
+        emoji: "🌊",
+        title: "金星的诞生：可能曾有海洋",
+        caption: "金星刚形成时，离太阳比地球近一些，温度稍高。早期可能拥有液态水海洋，持续数亿年。但好景不长——太阳越来越亮，金星开始了它的「失控温室」之路。"
+      }
+    },
+    {
+      key: "runaway-greenhouse",
+      name: "失控温室效应",
+      ageStartMyr: 10, ageEndMyr: 500,
+      spanLabel: "1000万 ~ 50 亿年",
+      state: "地表460°C高温",
+      lumLsun: 0.00000001, tempK: 735, radiusRsun: 0.0095,
+      color: "#ff9944", halo: "rgba(255,140,60,0.5)",
+      note: "太阳亮度增加，海洋蒸发，水汽加剧温室效应，形成92倍大气压的炼狱。",
+      teach: {
+        emoji: "🌋",
+        title: "失控温室：地球的「黑暗未来」",
+        caption: "金星海洋蒸发后，水汽锁住了更多热量，温度越高蒸发越快——失控了！现在金星地表460°C，大气压是地球的92倍，下着硫酸雨。这是地球10亿年后的可能命运。"
+      }
+    },
+    {
+      key: "engulfed",
+      name: "太阳膨胀吞噬",
+      ageStartMyr: 8000, ageEndMyr: 12000,
+      spanLabel: "80 ~ 120 亿年",
+      state: "被红巨星吞噬",
+      lumLsun: 0.0000001, tempK: 2500, radiusRsun: 0.0095,
+      color: "#ff5533", halo: "rgba(255,80,40,0.65)",
+      note: "太阳进入红巨星阶段，金星第二个被吞没，在太阳大气中解体。",
+      special: "earth-relic",
+      teach: {
+        emoji: "🔥",
+        title: "终章：第二个消失的行星",
+        caption: "水星消失后，轮到金星。它被红巨星太阳的外层大气吞没，在数千年的过程中被逐渐加热、蒸发、解体。曾经的「地球姐妹」，化为太阳大气的离子尘埃。"
+      }
+    }
+  ],
+  endingTitle: "终章：被红巨星太阳吞噬",
+  endingDesc: "曾经可能拥有海洋的「地球姐妹」，经历了失控温室效应的炼狱，最终在红巨星太阳中解体。",
+  endingBadge: "🔥 金星终结",
+  endingNote: "💡 金星是地球的「反面教材」：同样的岩石行星，只因离太阳稍近，就走向了完全不同的命运——温室失控，万劫不复。",
+  quiz: [
+    { q: "金星为什么这么热？", a: "失控温室效应！海洋蒸发后水汽加剧保温，形成460°C的炼狱。", ok: true, icon: "🌡️" },
+    { q: "金星自转有什么特别？", a: "它是倒着转的！自转243天，公转225天，一天比一年长，而且是逆行。", ok: true, icon: "🔄" },
+    { q: "金星和地球有什么共同点？", a: "大小和质量非常接近，都叫「姐妹星」。但命运截然不同。", ok: true, icon: "👯" }
+  ]
+};
+
+const PLANET_MARS = {
+  key: "mars",
+  name: "火星",
+  massLabel: "0.107 M⊕",
+  massRatio: 0.107,
+  category: "planet",
+  themeColor: "#ff5533",
+  gradientFrom: "#ff7755",
+  gradientTo: "#992211",
+  summary: "曾经的「蓝色火星」，磁场消失后失去了液态水，现在是寒冷的红色荒漠。",
+  funFact: "火星上的奥林帕斯山是太阳系最高的山，高度是珠峰的近3倍！",
+  fate: "🔥 可能被太阳吞噬",
+  fateColor: "#ff8844",
+  phases: [
+    {
+      key: "formation",
+      name: "形成期",
+      ageStartMyr: 0, ageEndMyr: 100,
+      spanLabel: "0 ~ 1 亿年",
+      state: "原行星吸积",
+      lumLsun: 0.00000001, tempK: 1000, radiusRsun: 0.0053,
+      color: "#ff8866", halo: "rgba(255,120,80,0.4)",
+      note: "在太阳系外圈成形，比地球小，可能曾有浓厚大气和液态水。",
+      teach: {
+        emoji: "🌊",
+        title: "火星的诞生：可能曾是蓝色星球",
+        caption: "火星形成时可能拥有浓厚的大气和液态水海洋。它的重力比地球小，但足以留住水。数十亿年前，火星可能和地球一样，是一个蓝色的世界——只是更小、更冷。"
+      }
+    },
+    {
+      key: "magnetic-death",
+      name: "磁场消失",
+      ageStartMyr: 100, ageEndMyr: 1000,
+      spanLabel: "1 ~ 10 亿年",
+      state: "大气逃逸",
+      lumLsun: 0.00000001, tempK: 210, radiusRsun: 0.0053,
+      color: "#dd5533", halo: "rgba(200,70,40,0.35)",
+      note: "核心冷却，磁场消失，太阳风逐渐剥离大气，水分蒸发逃逸。",
+      teach: {
+        emoji: "🧲",
+        title: "致命转折：磁场的消失",
+        caption: "火星比地球小，核心更快冷却。当磁场消失后，太阳风开始一点点剥离大气层。没有了大气保护，水蒸发后逃逸到太空，曾经的「蓝色火星」变成了红色荒漠。"
+      }
+    },
+    {
+      key: "desert",
+      name: "红色荒漠",
+      ageStartMyr: 1000, ageEndMyr: 8000,
+      spanLabel: "10 ~ 80 亿年",
+      state: "寒冷干燥",
+      lumLsun: 0.00000001, tempK: 210, radiusRsun: 0.0053,
+      color: "#cc4422", halo: "rgba(180,60,30,0.3)",
+      note: "现在的火星：稀薄大气、寒冷地表、干涸河床、两极冰盖。",
+      teach: {
+        emoji: "🏜️",
+        title: "火星的现在：寒冷的红色死星",
+        caption: "今天的火星大气只有地球的1%，平均温度-60°C。但我们可以看到干涸的河床、三角洲——它们证明火星曾有液态水。我们正在寻找生命痕迹，探索是否曾有火星人。"
+      }
+    },
+    {
+      key: "fate",
+      name: "终局",
+      ageStartMyr: 8000, ageEndMyr: 12000,
+      spanLabel: "80 ~ 120 亿年",
+      state: "被太阳吞噬或存活",
+      lumLsun: 0.00000001, tempK: 800, radiusRsun: 0.0053,
+      color: "#ff6644", halo: "rgba(255,100,60,0.55)",
+      note: "红巨星太阳可能吞没火星，也可能因为质量流失而让火星轨道外移。",
+      special: "earth-relic",
+      teach: {
+        emoji: "⚡",
+        title: "悬念：火星能活下来吗？",
+        caption: "当太阳膨胀成红巨星时，火星的命运悬而未决。它可能被吞没，也可能因太阳流失质量导致轨道外移而存活。如果活下来，火星会成为太阳系的「最后堡垒」，见证太阳熄灭的全过程。"
+      }
+    }
+  ],
+  endingTitle: "终章：悬念结局",
+  endingDesc: "火星的命运充满悬念——可能被红巨星太阳吞没，也可能存活下来，成为太阳系的最后见证者。",
+  endingBadge: "⚡ 火星悬念",
+  endingNote: "💡 火星的命运取决于太阳红巨星阶段的质量流失速度。如果太阳损失足够多质量，火星轨道会外移，可能逃过一劫。",
+  quiz: [
+    { q: "火星为什么是红色的？", a: "表面富含氧化铁（铁锈），反射阳光后呈现红色。", ok: true, icon: "🔴" },
+    { q: "火星曾有过液态水吗？", a: "有的！探测器发现了干涸河床、三角洲、甚至可能的古湖泊遗迹。", ok: true, icon: "💧" },
+    { q: "火星磁场消失后发生了什么？", a: "太阳风剥离大气，水蒸发逃逸，从「蓝色星球」变成红色荒漠。", ok: true, icon: "🧲" }
+  ]
+};
+
+const PLANET_JUPITER = {
+  key: "jupiter",
+  name: "木星",
+  massLabel: "317.8 M⊕",
+  massRatio: 317.8,
+  category: "planet",
+  themeColor: "#ffcc88",
+  gradientFrom: "#ffd9aa",
+  gradientTo: "#cc8844",
+  summary: "太阳系最大的行星，质量是其他所有行星总和的2.5倍，是行星中的「王者」。",
+  funFact: "木星的大红斑已经持续了至少350年，是一个比地球还大的超级风暴！",
+  fate: "🌌 可能存活",
+  fateColor: "#8899cc",
+  phases: [
+    {
+      key: "formation",
+      name: "形成期",
+      ageStartMyr: 0, ageEndMyr: 10,
+      spanLabel: "0 ~ 1000 万年",
+      state: "气体巨行星吸积",
+      lumLsun: 0.0000001, tempK: 800, radiusRsun: 0.10045,
+      color: "#ffcc88", halo: "rgba(255,200,130,0.4)",
+      note: "在太阳系外围成形，吸收大量氢氦气体，成为最大的行星。",
+      teach: {
+        emoji: "🌪️",
+        title: "木星的诞生：行星中的「巨无霸」",
+        caption: "木星在太阳系外围形成，这里有更多的原始气体和尘埃。它疯狂吸积，成为行星中的巨无霸——质量是其他所有行星总和的2.5倍！如果再大几十倍，它可能就变成另一颗恒星了。"
+      }
+    },
+    {
+      key: "great-red-spot",
+      name: "大红斑时代",
+      ageStartMyr: 100, ageEndMyr: 8000,
+      spanLabel: "1亿 ~ 80 亿年",
+      state: "超级风暴肆虐",
+      lumLsun: 0.0000001, tempK: 165, radiusRsun: 0.10045,
+      color: "#ff9966", halo: "rgba(255,140,90,0.5)",
+      note: "大红斑风暴持续数百年，风速达620 km/h，是地球风暴的3倍。",
+      teach: {
+        emoji: "🌀",
+        title: "大红斑：永不停歇的超级风暴",
+        caption: "木星的大红斑是一个比地球还大的超级风暴！持续了至少350年，风速620公里/小时——是地球最强飓风的3倍。而且木星有79颗卫星，其中四颗「伽利略卫星」每个都像小行星一样独特。"
+      }
+    },
+    {
+      key: "fate",
+      name: "太阳演化",
+      ageStartMyr: 8000, ageEndMyr: 15000,
+      spanLabel: "80 ~ 150 亿年",
+      state: "轨道可能外移",
+      lumLsun: 0.0000001, tempK: 200, radiusRsun: 0.10045,
+      color: "#ddaa66", halo: "rgba(200,160,90,0.35)",
+      note: "红巨星太阳质量流失，木星轨道可能外移，逃离吞噬。",
+      special: "earth-relic",
+      teach: {
+        emoji: "🌌",
+        title: "悬念：木星能存活吗？",
+        caption: "当太阳膨胀成红巨星时，它会流失大量质量。这可能让木星轨道外移，逃离吞噬。如果木星存活，它会成为白矮星太阳的行星，继续在黑暗中运转。四颗伽利略卫星会变成冰冻世界。"
+      }
+    }
+  ],
+  endingTitle: "终章：可能存活",
+  endingDesc: "木星的命运充满悬念——可能因太阳质量流失而轨道外移，逃过红巨星吞噬，成为白矮星太阳的行星。",
+  endingBadge: "🌌 木星悬念",
+  endingNote: "💡 木星质量巨大，有足够的引力保持氢氦大气。即使太阳熄灭，木星内部的热源也可能维持某些卫星的地下海洋。",
+  quiz: [
+    { q: "木星有多少颗卫星？", a: "至少95颗已确认！其中四颗「伽利略卫星」特别巨大。", ok: true, icon: "🌙" },
+    { q: "大红斑是什么？", a: "一个持续了至少350年的超级风暴，大小超过地球。", ok: true, icon: "🌀" },
+    { q: "木星会变成恒星吗？", a: "不会。它质量还不够，需要再大几十倍才可能点燃核聚变。", ok: false, icon: "⭐" }
+  ]
+};
+
+const PLANET_SATURN = {
+  key: "saturn",
+  name: "土星",
+  massLabel: "95.2 M⊕",
+  massRatio: 95.2,
+  category: "planet",
+  themeColor: "#f0d890",
+  gradientFrom: "#ffe4a0",
+  gradientTo: "#c8a060",
+  summary: "以壮观的土星环闻名，是太阳系最美的行星，环系由冰和岩石碎片组成。",
+  funFact: "土星的密度比水还低！如果有足够大的水池，土星会漂在水面上。",
+  fate: "🌌 可能存活",
+  fateColor: "#8899cc",
+  phases: [
+    {
+      key: "formation",
+      name: "形成期",
+      ageStartMyr: 0, ageEndMyr: 50,
+      spanLabel: "0 ~ 5000 万年",
+      state: "气体巨行星吸积",
+      lumLsun: 0.0000001, tempK: 150, radiusRsun: 0.0837,
+      color: "#f0d890", halo: "rgba(240,210,140,0.4)",
+      note: "在木星轨道外成形，吸收大量氢氦气体。",
+      teach: {
+        emoji: "🌪️",
+        title: "土星的诞生：木星的「小弟」",
+        caption: "土星在木星轨道外侧形成，吸收了大量气体和冰。它比木星小一些，但依然是一个气体巨行星。它的低密度（比水还轻）意味着它主要由轻元素氢和氦组成。"
+      }
+    },
+    {
+      key: "ring-formation",
+      name: "土星环形成",
+      ageStartMyr: 50, ageEndMyr: 500,
+      spanLabel: "5000万 ~ 5 亿年",
+      state: "环系确立",
+      lumLsun: 0.0000001, tempK: 134, radiusRsun: 0.0837,
+      color: "#ffe0aa", halo: "rgba(255,220,160,0.5)",
+      note: "土星环可能由彗星、小行星或被撕碎的卫星残骸形成。",
+      teach: {
+        emoji: "💍",
+        title: "土星环：宇宙最美的戒指",
+        caption: "土星环由数十亿块冰和岩石碎片组成，宽度达28万公里，但厚度只有10米到1公里！它们可能来自被土星引力撕碎的彗星或卫星。而且土星有146颗卫星，其中泰坦有浓厚大气。"
+      }
+    },
+    {
+      key: "stable",
+      name: "稳定期",
+      ageStartMyr: 500, ageEndMyr: 8000,
+      spanLabel: "5 ~ 80 亿年",
+      state: "光环辉煌",
+      lumLsun: 0.0000001, tempK: 134, radiusRsun: 0.0837,
+      color: "#e8d090", halo: "rgba(230,200,130,0.35)",
+      note: "土星以目前的姿态稳定存在，环系不断碰撞重组。",
+      teach: {
+        emoji: "✨",
+        title: "土星的现在：太阳系的「网红」",
+        caption: "土星以壮观的环系闻名，每15年一次环面朝向地球。它还有146颗已确认卫星，其中泰坦有浓厚大气和液态甲烷湖泊，恩克拉多斯有地下海洋——可能孕育生命！"
+      }
+    },
+    {
+      key: "fate",
+      name: "终局",
+      ageStartMyr: 8000, ageEndMyr: 15000,
+      spanLabel: "80 ~ 150 亿年",
+      state: "可能存活",
+      lumLsun: 0.0000001, tempK: 150, radiusRsun: 0.0837,
+      color: "#d8c080", halo: "rgba(210,180,110,0.3)",
+      note: "红巨星太阳质量流失可能让土星轨道外移。",
+      special: "earth-relic",
+      teach: {
+        emoji: "🌌",
+        title: "悬念：土星会失去环吗？",
+        caption: "土星环可能在1亿年内逐渐消失——环物质会坠落到土星上。但当太阳变成红巨星时，土星可能因轨道外移而存活。如果如此，它将成为白矮星太阳的行星，但可能已经没有光环了。"
+      }
+    }
+  ],
+  endingTitle: "终章：可能存活",
+  endingDesc: "土星可能因太阳质量流失而轨道外移，逃过红巨星吞噬。但它壮观的环系可能在太阳熄灭前就消失了。",
+  endingBadge: "🌌 土星悬念",
+  endingNote: "💡 土星环正在逐渐消失！科学家估计1亿年后它们可能全部坠落到土星上，或者被太阳的辐射压力推开。",
+  quiz: [
+    { q: "土星环是什么组成的？", a: "主要是冰块和岩石碎片，宽度巨大但厚度极薄。", ok: true, icon: "💍" },
+    { q: "土星的密度为什么这么低？", a: "它主要由轻元素氢和氦组成，密度比水还低。", ok: true, icon: "🌡️" },
+    { q: "土星有多少颗卫星？", a: "至少146颗已确认！其中泰坦和恩克拉多斯最有名。", ok: true, icon: "🌙" }
+  ]
+};
+
+const PLANET_URANUS = {
+  key: "uranus",
+  name: "天王星",
+  massLabel: "14.5 M⊕",
+  massRatio: 14.5,
+  category: "planet",
+  themeColor: "#88ccdd",
+  gradientFrom: "#a0ddee",
+  gradientTo: "#4488aa",
+  summary: "太阳系最奇怪的行星——侧躺着自转，像在宇宙中「打滚」。",
+  funFact: "天王星的一年是84个地球年，每个半球会连续42年白天、42年黑夜。",
+  fate: "🌌 存活",
+  fateColor: "#8899cc",
+  phases: [
+    {
+      key: "formation",
+      name: "形成期",
+      ageStartMyr: 0, ageEndMyr: 100,
+      spanLabel: "0 ~ 1 亿年",
+      state: "冰巨行星吸积",
+      lumLsun: 0.00000001, tempK: 50, radiusRsun: 0.0363,
+      color: "#88ccdd", halo: "rgba(130,200,220,0.35)",
+      note: "在太阳系外围成形，富含水、氨、甲烷等「冰」物质。",
+      teach: {
+        emoji: "🧊",
+        title: "天王星的诞生：远日行星",
+        caption: "天王星在太阳系极外圈形成，这里温度极低，水、氨、甲烷都凝结成冰。它被称为「冰巨星」，内部是高压冰层，外层是氢氦大气。它是太阳系最冷的行星之一。"
+      }
+    },
+    {
+      key: "tilt",
+      name: "侧躺自转",
+      ageStartMyr: 100, ageEndMyr: 8000,
+      spanLabel: "1 ~ 80 亿年",
+      state: "极端倾斜",
+      lumLsun: 0.00000001, tempK: 76, radiusRsun: 0.0363,
+      color: "#88bbcc", halo: "rgba(130,180,200,0.3)",
+      note: "自转轴倾斜98°，几乎「躺平」绕太阳公转。",
+      teach: {
+        emoji: "🔄",
+        title: "宇宙中最怪的行星：躺着打滚",
+        caption: "天王星的自转轴倾斜了98°，几乎是「躺着」绕太阳转！可能是早期被某个大天体撞歪了。这意味着它的每个极点会连续42年白天、42年黑夜——宇宙中最极端的季节！"
+      }
+    },
+    {
+      key: "fate",
+      name: "远日存活",
+      ageStartMyr: 8000, ageEndMyr: 20000,
+      spanLabel: "80 ~ 200 亿年",
+      state: "白矮星时代",
+      lumLsun: 0.00000001, tempK: 50, radiusRsun: 0.0363,
+      color: "#66aacc", halo: "rgba(100,160,200,0.25)",
+      note: "离太阳足够远，红巨星阶段可能存活。",
+      special: "earth-relic",
+      teach: {
+        emoji: "🌌",
+        title: "终章：成为白矮星的行星",
+        caption: "天王星离太阳足够远，几乎肯定能在红巨星阶段存活。当太阳变成白矮星后，天王星会继续在黑暗中绕着这颗熄灭的太阳运转——一个永恒的、寒冷的、无光的太阳系遗物。"
+      }
+    }
+  ],
+  endingTitle: "终章：永恒的冰巨星",
+  endingDesc: "离太阳足够远，天王星几乎肯定能存活过红巨星阶段，成为白矮星太阳的行星——一个永恒的冰冻世界。",
+  endingBadge: "🌌 天王星存活",
+  endingNote: "💡 天王星的内部热源异常微弱，它是太阳系唯一「不产热」的巨行星，几乎完全依赖太阳的微弱辐射。",
+  quiz: [
+    { q: "天王星为什么侧躺着？", a: "可能是早期被一个大天体撞击，把自转轴撞歪了98°。", ok: true, icon: "💥" },
+    { q: "天王星一年有多长？", a: "84个地球年！每个半球会连续42年白天、42年黑夜。", ok: true, icon: "📅" },
+    { q: "天王星是什么类型的行星？", a: "冰巨星！主要由水、氨、甲烷的「冰」组成，不是气态巨星。", ok: true, icon: "🧊" }
+  ]
+};
+
+const PLANET_NEPTUNE = {
+  key: "neptune",
+  name: "海王星",
+  massLabel: "17.1 M⊕",
+  massRatio: 17.1,
+  category: "planet",
+  themeColor: "#4466ff",
+  gradientFrom: "#6688ff",
+  gradientTo: "#223388",
+  summary: "太阳系最远的行星，风速达2100 km/h，是太阳系风暴最猛烈的地方。",
+  funFact: "海王星的一年是165个地球年，从发现到现在（1846年）它还没绕太阳转完一圈！",
+  fate: "🌌 存活",
+  fateColor: "#8899cc",
+  phases: [
+    {
+      key: "formation",
+      name: "形成期",
+      ageStartMyr: 0, ageEndMyr: 100,
+      spanLabel: "0 ~ 1 亿年",
+      state: "冰巨行星吸积",
+      lumLsun: 0.00000001, tempK: 50, radiusRsun: 0.0353,
+      color: "#4466ff", halo: "rgba(70,100,255,0.35)",
+      note: "在太阳系最外圈成形，富含冰物质。",
+      teach: {
+        emoji: "🧊",
+        title: "海王星的诞生：太阳系的边缘守卫",
+        caption: "海王星在太阳系最外圈形成，是最后一颗行星。它和天王星一样是「冰巨星」，主要由水、氨、甲烷组成。它的蓝色来自甲烷吸收红光，反射蓝光。"
+      }
+    },
+    {
+      key: "great-dark-spot",
+      name: "大黑斑时代",
+      ageStartMyr: 100, ageEndMyr: 8000,
+      spanLabel: "1 ~ 80 亿年",
+      state: "超级风暴肆虐",
+      lumLsun: 0.00000001, tempK: 72, radiusRsun: 0.0353,
+      color: "#3355dd", halo: "rgba(50,80,220,0.4)",
+      note: "拥有太阳系最猛烈的风暴，风速达2100 km/h。",
+      teach: {
+        emoji: "🌪️",
+        title: "宇宙最强风暴：时速2100公里",
+        caption: "海王星的风暴是太阳系最猛烈的！风速2100公里/小时，是地球最强飓风的9倍！它内部的热源驱动这些风暴，尽管太阳照射微弱。大黑斑曾像木星的大红斑一样巨大。"
+      }
+    },
+    {
+      key: "fate",
+      name: "远日存活",
+      ageStartMyr: 8000, ageEndMyr: 20000,
+      spanLabel: "80 ~ 200 亿年",
+      state: "白矮星时代",
+      lumLsun: 0.00000001, tempK: 50, radiusRsun: 0.0353,
+      color: "#2244cc", halo: "rgba(30,60,200,0.25)",
+      note: "离太阳最远，肯定能存活过红巨星阶段。",
+      special: "earth-relic",
+      teach: {
+        emoji: "🌌",
+        title: "终章：最后的太阳系行星",
+        caption: "海王星离太阳最远，几乎百分之百能在红巨星阶段存活。当太阳变成白矮星后，海王星会继续绕着这个熄灭的太阳运转，成为太阳系最后的行星遗物——见证一个恒星系的消亡。"
+      }
+    }
+  ],
+  endingTitle: "终章：永恒的蓝色守护者",
+  endingDesc: "离太阳最远，海王星几乎肯定能存活过红巨星阶段，成为白矮星太阳的行星——太阳系最后的蓝色遗物。",
+  endingBadge: "🌌 海王星存活",
+  endingNote: "💡 海王星的卫星特里同是太阳系最冷的地方之一，表面温度-235°C，但内部可能有地下海洋。",
+  quiz: [
+    { q: "海王星的风速有多快？", a: "可达2100 km/h，是地球最强飓风的9倍！", ok: true, icon: "🌪️" },
+    { q: "海王星为什么是蓝色的？", a: "大气中的甲烷吸收红光，反射蓝光。", ok: true, icon: "🔵" },
+    { q: "海王星绕太阳一圈多久？", a: "165个地球年！从1846年发现到现在还没转完一圈。", ok: true, icon: "📅" }
+  ]
+};
+
+// ============================================================
+// 6. 分组目录 — 太阳系行星 + 恒星演化对比
+// ============================================================
+
+const PLANETS = [PLANET_MERCURY, PLANET_VENUS, EARTH, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE];
+
+const STARS = [STAR_RED_DWARF, STAR_SUN, STAR_MASSIVE, STAR_100M, STAR_250M];
+
+// 为所有对象添加 category 字段
+PLANETS.forEach(p => p.category = "planet");
+STARS.forEach(s => s.category = "star");
+
+// 完整目录：行星在前，恒星在后
+const SOLAR_SYSTEM_CATALOG = [...PLANETS, ...STARS];
+
+// 保留旧名兼容
+const STAR_CATALOG = SOLAR_SYSTEM_CATALOG;

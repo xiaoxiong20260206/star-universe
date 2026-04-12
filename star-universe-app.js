@@ -95,10 +95,56 @@ function getUnifiedVisualScale(star, phase, selectedCount = 6) {
   // 统一比例尺 + 自适应放大：
   // 1) 多星同屏(>=5): 严格统一比例，便于比较
   // 2) 少星聚焦(1~2): 显著放大，提升可读性
+  // 3) 行星独立处理：气态巨行星需要特殊压缩
   // -------------------------------------------------------
 
   const phaseClass = classifyPhase(phase);
   const m = Math.max(star.massRatio, 0.000001);
+
+  const BASE = 60;
+
+  const viewZoomFactor = selectedCount >= 5
+    ? 1.00
+    : selectedCount === 4
+      ? 1.12
+      : selectedCount === 3
+        ? 1.28
+        : selectedCount === 2
+          ? 1.62
+          : 2.20;
+
+  // -------------------------------------------------------
+  // 行星尺寸处理（独立逻辑）
+  // -------------------------------------------------------
+  if (star.category === "planet") {
+    const massInEarthMasses = star.massRatio; // 行星的massRatio已经是相对地球的质量
+    const isGasGiant = massInEarthMasses > 10; // 木星/土星/天王星/海王星
+    const isIceGiant = massInEarthMasses > 10 && massInEarthMasses < 50; // 天王星/海王星
+    
+    // 行星基础尺寸（地球为参考基准）
+    const planetBase = 18;
+    
+    // 行星尺寸压缩因子（避免气态巨行星撑爆屏幕）
+    // 木星质量是地球317倍，但我们只让它显示为约2.5倍直径
+    let planetSize;
+    if (isGasGiant) {
+      // 气态巨行星：强压缩
+      const compression = isIceGiant ? 0.15 : 0.08;
+      planetSize = planetBase * Math.pow(massInEarthMasses, compression);
+    } else {
+      // 类地行星：正常比例
+      planetSize = planetBase * Math.pow(Math.max(0.05, massInEarthMasses), 0.25);
+    }
+    
+    // 应用视口缩放
+    planetSize *= viewZoomFactor;
+    
+    // 行星尺寸上下限
+    const minPlanetSize = 12;
+    const maxPlanetSize = selectedCount === 1 ? 45 : selectedCount <= 2 ? 38 : 28;
+    
+    return Math.round(Math.min(maxPlanetSize, Math.max(minPlanetSize, planetSize)));
+  }
 
   const stageMultiplier = {
     cloud: 0.80,
@@ -117,18 +163,6 @@ function getUnifiedVisualScale(star, phase, selectedCount = 6) {
     "earth-living": 0.08,
     "earth-relic": 0.06,
   }[phaseClass] ?? 1.0;
-
-  const BASE = 60;
-
-  const viewZoomFactor = selectedCount >= 5
-    ? 1.00
-    : selectedCount === 4
-      ? 1.12
-      : selectedCount === 3
-        ? 1.28
-        : selectedCount === 2
-          ? 1.62
-          : 2.20;
 
   const isFixed = [
     "white-dwarf", "black-dwarf", "compact", "black-hole",
@@ -375,9 +409,9 @@ class UniverseStageCard {
 
 class StarUniverseApp {
   constructor() {
-    this.catalog = [...STAR_CATALOG, STAR_100M, STAR_250M];
-    this.selected = new Set(["red-dwarf", "sun", "massive", "black-hole", "extreme", "earth"]);
-    this.focusKey = "sun";
+    this.catalog = SOLAR_SYSTEM_CATALOG;
+    this.selected = new Set(["mercury", "venus", "earth", "mars", "jupiter", "saturn", "uranus", "neptune"]);
+    this.focusKey = "earth";
     this.progress = 0;
     this.speed = 1;
     this.playing = false;
@@ -450,7 +484,10 @@ class StarUniverseApp {
   }
 
   renderSelector() {
-    this.selectorGrid.innerHTML = this.catalog.map((star) => `
+    const planets = this.catalog.filter(item => item.category === "planet");
+    const stars = this.catalog.filter(item => item.category === "star");
+    
+    const renderChip = (star) => `
       <button class="selector-chip ${this.selected.has(star.key) ? "active" : ""} ${this.focusKey === star.key ? "focused" : ""}"
               data-key="${star.key}"
               style="--chip-color:${star.themeColor}">
@@ -459,7 +496,55 @@ class StarUniverseApp {
         <div class="fate" style="color:${star.fateColor}">${star.fate}</div>
         <div class="summary">${star.summary}</div>
       </button>
-    `).join("");
+    `;
+    
+    this.selectorGrid.innerHTML = `
+      <div class="selector-group">
+        <div class="group-head">
+          <span class="group-label">🪐 太阳系行星</span>
+          <button class="group-toggle" data-action="toggle-planet">全选</button>
+        </div>
+        <div class="group-grid">
+          ${planets.map(s => renderChip(s)).join("")}
+        </div>
+      </div>
+      <div class="selector-group collapsed">
+        <div class="group-head">
+          <span class="group-label">⭐ 恒星演化对比</span>
+          <button class="group-toggle" data-action="toggle-star">展开</button>
+        </div>
+        <div class="group-grid">
+          ${stars.map(s => renderChip(s)).join("")}
+        </div>
+      </div>
+    `;
+
+    // 绑定分组切换
+    this.selectorGrid.querySelectorAll(".group-toggle").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const action = e.currentTarget.dataset.action;
+        const group = e.currentTarget.closest(".selector-group");
+        
+        if (action === "toggle-planet") {
+          // 全选/取消全选行星
+          const allSelected = planets.every(p => this.selected.has(p.key));
+          if (allSelected) {
+            planets.forEach(p => this.selected.delete(p.key));
+          } else {
+            planets.forEach(p => this.selected.add(p.key));
+          }
+          e.currentTarget.textContent = allSelected ? "全选" : "取消全选";
+        } else if (action === "toggle-star") {
+          // 展开/折叠恒星分组
+          group.classList.toggle("collapsed");
+          e.currentTarget.textContent = group.classList.contains("collapsed") ? "展开" : "折叠";
+        }
+        
+        this.renderSelector();
+        this.renderStage();
+        this.render();
+      });
+    });
 
     this.selectorGrid.querySelectorAll(".selector-chip").forEach((button) => {
       button.addEventListener("click", (event) => {

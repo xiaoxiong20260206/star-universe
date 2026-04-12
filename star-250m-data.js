@@ -8,6 +8,7 @@ const STAR_100M = {
   name: "超大质量恒星",
   massLabel: "100 M☉",
   massRatio: 100,
+  category: "star",
   themeColor: "#7b8dff",
   gradientFrom: "#b8c3ff",
   gradientTo:   "#10081f",
