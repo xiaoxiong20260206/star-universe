@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>宇宙站 · 太阳系八大行星同屏演化 | 星球的一生</title>
-  <meta name="description" content="在一个统一页面中探索太阳系八大行星的演化历程，支持行星对比与恒星演化演示。" />
+  <title>宇宙探险站 · 太阳系八大行星同屏演化</title>
+  <meta name="description" content="带孩子探索太阳系八大行星的一生！用有趣的动画和讲解，看行星从诞生到终局的完整演化。" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="stylesheet" href="star-universe.css" />
 </head>
 <body>
+  <!-- 背景 -->
   <div class="cosmos-bg">
     <div class="aurora-a"></div>
     <div class="aurora-b"></div>
@@ -18,8 +19,37 @@
     <div class="stars-layer" id="starsLayer"></div>
   </div>
 
+  <!-- 全屏闪光特效 -->
   <div id="globalFlash" class="global-flash"></div>
 
+  <!-- 庆祝粒子层 -->
+  <canvas id="celebCanvas" class="celeb-canvas"></canvas>
+
+  <!-- 欢迎引导弹层 -->
+  <div id="welcomeOverlay" class="welcome-overlay">
+    <div class="welcome-card">
+      <div class="welcome-planets-row">
+        <span class="wp-planet" style="animation-delay:0s">🌍</span>
+        <span class="wp-planet" style="animation-delay:0.1s">🪐</span>
+        <span class="wp-planet" style="animation-delay:0.2s">⭐</span>
+        <span class="wp-planet" style="animation-delay:0.3s">🔴</span>
+        <span class="wp-planet" style="animation-delay:0.4s">🟠</span>
+        <span class="wp-planet" style="animation-delay:0.5s">🧊</span>
+        <span class="wp-planet" style="animation-delay:0.6s">💙</span>
+        <span class="wp-planet" style="animation-delay:0.7s">☿</span>
+      </div>
+      <h2 class="welcome-title">🚀 宇宙探险开始！</h2>
+      <p class="welcome-desc">欢迎来到太阳系！这里有八颗行星，每颗都有自己独特的一生。<br/>你来当宇宙探险家，看看它们从诞生到终局的故事吧！</p>
+      <div class="welcome-steps">
+        <div class="ws-step"><span class="ws-num">①</span> <span>点击下方<strong>行星卡片</strong>选择要探索的行星</span></div>
+        <div class="ws-step"><span class="ws-num">②</span> <span>点击 <strong>🚀 开始探索</strong> 按钮播放演化</span></div>
+        <div class="ws-step"><span class="ws-num">③</span> <span>探索完一颗行星可以解锁<strong>成就徽章</strong>🏆</span></div>
+      </div>
+      <button id="welcomeStart" class="welcome-btn">✨ 出发！</button>
+    </div>
+  </div>
+
+  <!-- 终章弹层 -->
   <div id="endingOverlay" class="ending-overlay">
     <div class="ending-card">
       <div class="ending-glow"></div>
@@ -28,107 +58,138 @@
       <p id="endingDesc" class="ending-desc"></p>
       <div id="endingBadge" class="ending-badge"></div>
       <p id="endingNote" class="ending-note"></p>
-      <button id="endingClose" class="ending-btn">↺ 继续探索</button>
+      <button id="endingClose" class="ending-btn">🔄 继续探索</button>
     </div>
   </div>
 
+  <!-- 成就徽章弹出提示 -->
+  <div id="badgeToast" class="badge-toast hidden">
+    <div class="badge-toast-inner">
+      <div id="badgeToastEmoji" class="bte-emoji">🏆</div>
+      <div>
+        <div class="bte-title">解锁成就！</div>
+        <div id="badgeToastText" class="bte-text">探索完成</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 冷知识卡片 -->
+  <div id="funFactCard" class="funfact-card hidden">
+    <div class="ff-emoji">💡</div>
+    <div id="funFactText" class="ff-text"></div>
+  </div>
+
   <main class="page-shell one-screen-layout">
+    <!-- Hero 区 -->
     <header class="hero glass-panel compact-hero">
       <div class="hero-copy">
-        <div class="hero-badge">STAR UNIVERSE · 统一宇宙站</div>
+        <div class="hero-badge">🚀 宇宙探险站 · STAR UNIVERSE</div>
         <h1>太阳系八大行星，同屏演化</h1>
         <p>
-          用统一比例尺，探索<strong>水星、金星、地球、火星、木星、土星、天王星、海王星</strong>从形成到终局的演化历程。还能切换对比恒星演化。
+          探索<strong>水星、金星、地球、火星、木星、土星、天王星、海王星</strong>从诞生到终局的完整旅程。用统一比例尺看清它们有多不一样！
         </p>
       </div>
       <div class="hero-stats">
-        <div class="hero-stat"><span>最小行星</span><strong>水星</strong><em>0.055 M⊕ · 被太阳吞噬</em></div>
-        <div class="hero-stat"><span>最大行星</span><strong>木星</strong><em>317.8 M⊕ · 可能存活</em></div>
-        <div class="hero-stat"><span>最远行星</span><strong>海王星</strong><em>30 AU · 几乎必存活</em></div>
+        <div class="hero-stat"><span>最小行星</span><strong>☿ 水星</strong><em>0.055 M⊕ · 命运：被太阳吞噬</em></div>
+        <div class="hero-stat"><span>最大行星</span><strong>🪐 木星</strong><em>317.8 M⊕ · 命运：可能存活</em></div>
+        <div class="hero-stat"><span>最远行星</span><strong>🔵 海王星</strong><em>30 AU · 命运：几乎必存活</em></div>
       </div>
     </header>
 
+    <!-- 成就徽章展示区 -->
+    <section id="badgeShelf" class="badge-shelf glass-panel hidden">
+      <span class="badge-shelf-label">🏆 我的探索徽章：</span>
+      <div id="badgeList" class="badge-list"></div>
+    </section>
+
+    <!-- 控制区 -->
     <section class="control-wrap glass-panel sticky-control">
       <div class="control-row top">
-        <button id="playBtn" class="action-btn primary">▶ 播放</button>
-        <button id="resetBtn" class="action-btn ghost">↺ 重置</button>
+        <button id="playBtn" class="action-btn primary">🚀 开始探索</button>
+        <button id="resetBtn" class="action-btn ghost">🔄 重新开始</button>
         <button id="quizToggleBtn" class="action-btn ghost">🧩 趣味问答</button>
         <button id="audioToggleBtn" class="action-btn ghost active">🔊 讲解开</button>
         <label class="speed-box">
           <span>速度</span>
           <select id="speedSelect">
-            <option value="0.4">慢速</option>
-            <option value="1" selected>标准</option>
-            <option value="2">快速</option>
-            <option value="4">极速</option>
+            <option value="0.4">🐢 慢速</option>
+            <option value="1" selected>🚶 标准</option>
+            <option value="2">🏃 快速</option>
+            <option value="4">🚀 极速</option>
           </select>
         </label>
         <div class="selector-actions inline-actions">
-          <button id="selectAllBtn" class="mini-btn">全选行星</button>
-          <button id="showFocusBtn" class="mini-btn">只看焦点</button>
+          <button id="selectAllBtn" class="mini-btn">🪐 八大行星全上</button>
+          <button id="showFocusBtn" class="mini-btn">🔍 放大观看</button>
         </div>
       </div>
     </section>
 
+    <!-- 演化舞台 -->
     <section class="stage-wrap glass-panel stage-fullscreen-friendly">
       <div class="section-head compact">
         <div>
           <p class="eyebrow">统一演化舞台</p>
-          <h2 id="stageTitle">六大天体同屏演化</h2>
+          <h2 id="stageTitle">八大行星同屏演化</h2>
         </div>
         <div id="selectionHint" class="selection-hint"></div>
       </div>
       <div class="stage-topbar">
         <div class="progress-wrap stage-progress-wrap">
           <div class="stage-progress-head">
-            <span class="stage-progress-title">统一时间轴</span>
-            <span class="stage-progress-order">默认排序：按恒星质量从小到大</span>
+            <span class="stage-progress-title">📅 宇宙时间轴</span>
+            <span id="progressText" class="stage-progress-order">进度 0%</span>
           </div>
-          <input id="progressBar" type="range" min="0" max="1000" value="0" />
+          <div class="timeline-wrap">
+            <input id="progressBar" type="range" min="0" max="1000" value="0" />
+            <div id="timelineMarkers" class="timeline-markers"></div>
+          </div>
           <div class="progress-labels">
-            <span>起点</span>
-            <span id="progressText">进度 0%</span>
-            <span>终章</span>
+            <span>⭐ 行星诞生</span>
+            <span id="phaseStatusText" class="phase-status-text"></span>
+            <span>🌌 终局</span>
           </div>
         </div>
       </div>
       <div id="stageGrid" class="stage-grid"></div>
     </section>
 
+    <!-- 天体选择器 -->
     <section class="selector-wrap glass-panel selector-compact">
       <div class="section-head compact">
         <div>
-          <p class="eyebrow">星种选择</p>
-          <h2>切换单星 / 多星比较</h2>
+          <p class="eyebrow">🌟 选择要探索的天体</p>
+          <h2>点击选中，双击单独放大</h2>
         </div>
       </div>
       <div id="selectorGrid" class="selector-grid"></div>
     </section>
 
+    <!-- 焦点信息 + 教学解说 -->
     <section class="insight-grid compact-insight">
       <article class="focus-card glass-panel">
-        <p class="eyebrow">当前焦点</p>
+        <p class="eyebrow">🔭 当前焦点</p>
         <div id="focusSummary"></div>
       </article>
       <section class="teach-wrap glass-panel">
-        <p class="eyebrow">教学解说</p>
+        <p class="eyebrow">📚 宇宙小课堂</p>
         <div class="teach-box">
           <div id="teachEmoji" class="teach-emoji">🌌</div>
           <div>
-            <h3 id="teachTitle">从分子云开始</h3>
-            <p id="teachCaption">选择一颗恒星作为焦点，点击播放，开始看它的一生。</p>
+            <h3 id="teachTitle">准备好探索了吗？</h3>
+            <p id="teachCaption">选择你感兴趣的行星，点击「🚀 开始探索」，看它从诞生到终局的完整故事！</p>
           </div>
         </div>
       </section>
     </section>
 
+    <!-- 趣味问答面板 -->
     <section id="quizPanel" class="quiz-wrap glass-panel hidden">
       <div id="quizSection"></div>
     </section>
 
     <footer class="footer-note">
-      数据为天体物理近似演示模型；真实恒星还会受到金属丰度、自转、双星系统等影响。地球演化数据为科学近似，不含文明影响因素。<br />
-      但有一条规律不会变：<strong>质量，决定命运。</strong>而我们，是那个先知道这件事的那颗星上的居民。
+      数据为天体物理近似演示模型，适合科普学习。质量决定天体命运——<strong>这是宇宙最深刻的规律之一。</strong>
     </footer>
   </main>
 

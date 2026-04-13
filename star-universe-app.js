@@ -438,15 +438,34 @@ class StarUniverseApp {
     // 阶段停留控制
     this.phaseStartMs = Date.now();
     this.lastPhaseIdx = -1;
-    this.minPhaseHoldMs = 3500; // 每阶段最小停留 3.5 秒
+    this.minPhaseHoldMs = 3500;
+
+    // 成就系统
+    this.unlockedBadges = new Set(JSON.parse(localStorage.getItem("star-badges") || "[]"));
+    this.exploredPhases = {}; // key -> Set of phaseKey
+
+    // 冷知识控制
+    this.funFactPhaseCount = 0;
+    this.lastFunFactAt = 0;
+    this.funFactTimer = null;
+
+    // 庆祝控制
+    this.lastCelebPhaseKey = null;
+    this.celebCanvas = null;
+    this.celebCtx = null;
+    this.celebParticles = [];
+    this.celebRafId = null;
 
     this.bindEls();
+    this.initCelebCanvas();
     this.updateAudioToggleUI();
     createBackgroundStars(this.starsLayer);
     this.renderSelector();
     this.renderStage();
     this.bindEvents();
     this.render();
+    this.showWelcomeIfFirst();
+    this.renderBadgeShelf();
   }
 
   bindEls() {
@@ -469,6 +488,8 @@ class StarUniverseApp {
     this.teachTitle = document.getElementById("teachTitle");
     this.teachCaption = document.getElementById("teachCaption");
     this.starsLayer = document.getElementById("starsLayer");
+    this.timelineMarkers = document.getElementById("timelineMarkers");
+    this.phaseStatusText = document.getElementById("phaseStatusText");
 
     this.endingOverlay = document.getElementById("endingOverlay");
     this.endingTitle = document.getElementById("endingTitle");
@@ -479,10 +500,223 @@ class StarUniverseApp {
 
     this.quizPanel = document.getElementById("quizPanel");
     this.quizSection = document.getElementById("quizSection");
+
+    this.welcomeOverlay = document.getElementById("welcomeOverlay");
+    this.welcomeStart = document.getElementById("welcomeStart");
+    this.badgeToast = document.getElementById("badgeToast");
+    this.badgeToastEmoji = document.getElementById("badgeToastEmoji");
+    this.badgeToastText = document.getElementById("badgeToastText");
+    this.badgeShelf = document.getElementById("badgeShelf");
+    this.badgeList = document.getElementById("badgeList");
+    this.funFactCard = document.getElementById("funFactCard");
+    this.funFactText = document.getElementById("funFactText");
   }
 
   getStar(key) {
     return this.catalog.find((item) => item.key === key);
+  }
+
+  // ============================================================
+  // 欢迎引导系统
+  // ============================================================
+  // ============================================================
+  showWelcomeIfFirst() {
+    const seen = localStorage.getItem("star-welcome-seen");
+    if (seen) return;
+    if (this.welcomeOverlay) this.welcomeOverlay.classList.add("visible");
+  }
+
+  // ============================================================
+  // 庆祝粒子系统
+  // ============================================================
+  initCelebCanvas() {
+    this.celebCanvas = document.getElementById("celebCanvas");
+    if (!this.celebCanvas) return;
+    this.celebCtx = this.celebCanvas.getContext("2d");
+    const resize = () => {
+      this.celebCanvas.width = window.innerWidth;
+      this.celebCanvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+  }
+
+  fireCelebration(intensity = "normal") {
+    if (!this.celebCtx) return;
+    const count = intensity === "epic" ? 120 : 60;
+    const colors = ["#ff6b6b", "#ffd93d", "#6bcb77", "#4d96ff", "#f72585", "#7209b7", "#ffffff"];
+    for (let i = 0; i < count; i++) {
+      this.celebParticles.push({
+        x: Math.random() * this.celebCanvas.width,
+        y: Math.random() * this.celebCanvas.height * 0.5,
+        vx: (Math.random() - 0.5) * 8,
+        vy: Math.random() * -8 - 2,
+        size: Math.random() * 8 + 3,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        life: 1.0,
+        decay: Math.random() * 0.02 + 0.01,
+      });
+    }
+    if (!this.celebRafId) this._animateCeleb();
+  }
+
+  _animateCeleb() {
+    if (!this.celebCtx || !this.celebCanvas) return;
+    this.celebCtx.clearRect(0, 0, this.celebCanvas.width, this.celebCanvas.height);
+    this.celebParticles = this.celebParticles.filter(p => p.life > 0);
+    for (const p of this.celebParticles) {
+      p.vy += 0.25; // gravity
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= p.decay;
+      this.celebCtx.globalAlpha = p.life;
+      this.celebCtx.fillStyle = p.color;
+      this.celebCtx.beginPath();
+      this.celebCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      this.celebCtx.fill();
+    }
+    this.celebCtx.globalAlpha = 1;
+    if (this.celebParticles.length > 0) {
+      this.celebRafId = requestAnimationFrame(() => this._animateCeleb());
+    } else {
+      this.celebRafId = null;
+    }
+  }
+
+  // ============================================================
+  // 成就徽章系统
+  // ============================================================
+  getBadgeDef(key) {
+    const defs = {
+      mercury:  { emoji: "☿",  title: "水星探险家", desc: "探索了水星的一生" },
+      venus:    { emoji: "♀️", title: "金星侦察员", desc: "探索了金星的一生" },
+      earth:    { emoji: "🌍", title: "地球守护者", desc: "探索了地球的一生" },
+      mars:     { emoji: "♂️", title: "火星科考员", desc: "探索了火星的一生" },
+      jupiter:  { emoji: "🪐", title: "木星征服者", desc: "探索了木星的一生" },
+      saturn:   { emoji: "🪐", title: "土星环旅行家", desc: "探索了土星的一生" },
+      uranus:   { emoji: "⛢",  title: "天王星侦探", desc: "探索了天王星的一生" },
+      neptune:  { emoji: "♆",  title: "海王星勇者", desc: "探索了海王星的一生" },
+      "red-dwarf": { emoji: "🔴", title: "红矮星学者", desc: "探索了红矮星的一生" },
+      sun:      { emoji: "☀️", title: "太阳能量使者", desc: "探索了太阳的一生" },
+      massive:  { emoji: "⭐", title: "大质量恒星猎手", desc: "探索了大质量恒星的一生" },
+      "black-hole": { emoji: "🕳️", title: "黑洞追踪者", desc: "探索了超大质量恒星的一生" },
+      extreme:  { emoji: "💥", title: "宇宙最强存在", desc: "探索了极端大质量恒星的一生" },
+    };
+    return defs[key] || { emoji: "🏆", title: "探险家", desc: "完成了探索" };
+  }
+
+  checkAndUnlockBadge(starKey) {
+    if (this.unlockedBadges.has(starKey)) return;
+    const star = this.getStar(starKey);
+    if (!star) return;
+    const explored = this.exploredPhases[starKey] || new Set();
+    // 需要探索所有阶段才能解锁
+    const allPhaseKeys = star.phases.map(p => p.key);
+    const allDone = allPhaseKeys.every(k => explored.has(k));
+    if (!allDone) return;
+    
+    this.unlockedBadges.add(starKey);
+    localStorage.setItem("star-badges", JSON.stringify([...this.unlockedBadges]));
+    const def = this.getBadgeDef(starKey);
+    this.showBadgeToast(def);
+    this.fireCelebration("epic");
+    this.renderBadgeShelf();
+  }
+
+  showBadgeToast(def) {
+    if (!this.badgeToast) return;
+    this.badgeToastEmoji.textContent = def.emoji;
+    this.badgeToastText.textContent = `${def.title} — ${def.desc}`;
+    this.badgeToast.classList.remove("hidden");
+    this.badgeToast.classList.add("show");
+    setTimeout(() => {
+      this.badgeToast.classList.remove("show");
+      setTimeout(() => this.badgeToast.classList.add("hidden"), 400);
+    }, 3000);
+  }
+
+  renderBadgeShelf() {
+    if (!this.badgeShelf || !this.badgeList) return;
+    if (this.unlockedBadges.size === 0) {
+      this.badgeShelf.classList.add("hidden");
+      return;
+    }
+    this.badgeShelf.classList.remove("hidden");
+    this.badgeList.innerHTML = [...this.unlockedBadges].map(key => {
+      const def = this.getBadgeDef(key);
+      const star = this.getStar(key);
+      return `<span class="badge-item" title="${def.title}: ${def.desc}">${def.emoji}<span class="badge-item-name">${star?.name || key}</span></span>`;
+    }).join("");
+  }
+
+  // ============================================================
+  // 冷知识卡片
+  // ============================================================
+  maybeShowFunFact() {
+    if (!this.playing) return;
+    const now = Date.now();
+    if (now - this.lastFunFactAt < 8000) return; // 最少间隔8秒
+    
+    // 收集所有当前选中天体的 funFact
+    const facts = [];
+    this.getSelectedStars().forEach(s => {
+      if (s.funFact) facts.push({ text: s.funFact, name: s.name, emoji: s.emoji || "⭐" });
+    });
+    if (!facts.length) return;
+
+    const fact = facts[Math.floor(Math.random() * facts.length)];
+    this.showFunFact(fact);
+    this.lastFunFactAt = now;
+  }
+
+  showFunFact(fact) {
+    if (!this.funFactCard || !this.funFactText) return;
+    this.funFactText.textContent = `${fact.emoji} ${fact.name}冷知识：${fact.text}`;
+    this.funFactCard.classList.remove("hidden", "hiding");
+    this.funFactCard.classList.add("show");
+    clearTimeout(this.funFactTimer);
+    this.funFactTimer = setTimeout(() => {
+      this.funFactCard.classList.add("hiding");
+      setTimeout(() => {
+        this.funFactCard.classList.remove("show", "hiding");
+        this.funFactCard.classList.add("hidden");
+      }, 500);
+    }, 4000);
+  }
+
+  // ============================================================
+  // 时间轴标记点渲染
+  // ============================================================
+  renderTimelineMarkers() {
+    if (!this.timelineMarkers) return;
+    const focusStar = this.getStar(this.focusKey);
+    if (!focusStar) return;
+    const ranges = buildRanges(focusStar.phases);
+    const markers = ranges.map((r, i) => {
+      const pct = (r.start / MAX_PROGRESS) * 100;
+      const phase = focusStar.phases[i];
+      const isCurrent = this.progress >= r.start && (i === ranges.length - 1 ? this.progress <= r.end : this.progress < r.end);
+      const isPast = r.end <= this.progress;
+      return `<div class="tl-marker ${isCurrent ? "current" : ""} ${isPast ? "past" : ""}"
+                   style="left:${pct}%"
+                   title="${phase.name}">
+                <div class="tl-dot"></div>
+                <div class="tl-label">${phase.name}</div>
+              </div>`;
+    });
+    this.timelineMarkers.innerHTML = markers.join("");
+  }
+
+  // ============================================================
+  // 卡片阶段切换动效
+  // ============================================================
+  triggerCardPop(starKey) {
+    const card = document.querySelector(`[data-key="${starKey}"]`);
+    if (!card) return;
+    card.classList.remove("phase-pop");
+    void card.offsetWidth; // reflow
+    card.classList.add("phase-pop");
+    setTimeout(() => card.classList.remove("phase-pop"), 600);
   }
 
   getSelectedStars() {
@@ -515,30 +749,37 @@ class StarUniverseApp {
     const planets = this.catalog.filter(item => item.category === "planet");
     const stars = this.catalog.filter(item => item.category === "star");
     
-    const renderChip = (star) => `
-      <button class="selector-chip ${this.selected.has(star.key) ? "active" : ""} ${this.focusKey === star.key ? "focused" : ""}"
-              data-key="${star.key}"
-              style="--chip-color:${star.themeColor}">
-        <div class="mass">${star.massLabel}</div>
-        <div class="name">${star.name}</div>
-        <div class="fate" style="color:${star.fateColor}">${star.fate}</div>
-        <div class="summary">${star.summary}</div>
-      </button>
-    `;
+    const renderChip = (item) => {
+      const isActive = this.selected.has(item.key);
+      const isFocused = this.focusKey === item.key;
+      const displayEmoji = item.emoji || item.massLabel?.split(" ")[0] || "⭐";
+      return `
+        <button class="selector-chip ${isActive ? "active" : ""} ${isFocused ? "focused" : ""}"
+                data-key="${item.key}"
+                style="--chip-color:${item.themeColor}">
+          <div class="chip-emoji" aria-hidden="true">${displayEmoji}</div>
+          <div class="chip-name">${item.name}</div>
+          <div class="chip-fate" style="color:${item.fateColor}">${item.fate}</div>
+          ${isActive ? `<div class="chip-check">✓</div>` : ""}
+        </button>
+      `;
+    };
     
+    const allPlanetsSelected = planets.every(p => this.selected.has(p.key));
+
     this.selectorGrid.innerHTML = `
-      <div class="selector-group">
+      <div class="selector-group" id="group-planets">
         <div class="group-head">
-          <span class="group-label">🪐 太阳系行星</span>
-          <button class="group-toggle" data-action="toggle-planet">全选</button>
+          <span class="group-label">🪐 太阳系八大行星</span>
+          <button class="group-toggle" data-action="toggle-planet">${allPlanetsSelected ? "取消全选" : "🌟 全选八大行星"}</button>
         </div>
         <div class="group-grid">
           ${planets.map(s => renderChip(s)).join("")}
         </div>
       </div>
-      <div class="selector-group collapsed">
+      <div class="selector-group collapsed" id="group-stars">
         <div class="group-head">
-          <span class="group-label">⭐ 恒星演化对比</span>
+          <span class="group-label">⭐ 恒星大家族（高级内容）</span>
           <button class="group-toggle" data-action="toggle-star">展开</button>
         </div>
         <div class="group-grid">
@@ -660,7 +901,7 @@ class StarUniverseApp {
 
   setPlaying(value) {
     this.playing = value;
-    this.playBtn.textContent = value ? "⏸ 暂停" : "▶ 播放";
+    this.playBtn.textContent = value ? "⏸ 暂停" : "🚀 开始探索";
     if (!value) this.stopNarration();
     cancelAnimationFrame(this.rafId);
     if (value) this.rafId = requestAnimationFrame(() => this.tick());
@@ -925,6 +1166,15 @@ class StarUniverseApp {
       this.endingClose.addEventListener("click", () => this.hideEnding());
     }
 
+    if (this.welcomeStart) {
+      this.welcomeStart.addEventListener("click", () => {
+        localStorage.setItem("star-welcome-seen", "1");
+        this.welcomeOverlay.classList.remove("visible");
+        this.welcomeOverlay.classList.add("hiding");
+        setTimeout(() => this.welcomeOverlay.classList.remove("hiding"), 600);
+      });
+    }
+
     window.addEventListener("resize", () => {
       this.renderStage();
       this.render();
@@ -943,7 +1193,11 @@ class StarUniverseApp {
 
   render() {
     this.ensureFocusVisible();
-    this.progressText.textContent = `进度 ${Math.round((this.progress / MAX_PROGRESS) * 100)}%`;
+    const pct = Math.round((this.progress / MAX_PROGRESS) * 100);
+    this.progressText.textContent = `进度 ${pct}%`;
+
+    // 更新时间轴标记
+    this.renderTimelineMarkers();
 
     let focusResult = null;
     this.getSelectedStars().forEach((star) => {
@@ -958,11 +1212,32 @@ class StarUniverseApp {
       if (result.phase.special === "blackhole") {
         this.triggerFlash("sn");
       }
+
+      // 追踪探索过的阶段（用于成就解锁）
+      if (this.playing) {
+        if (!this.exploredPhases[star.key]) this.exploredPhases[star.key] = new Set();
+        this.exploredPhases[star.key].add(result.phase.key);
+        this.checkAndUnlockBadge(star.key);
+      }
     });
 
     if (focusResult) {
       this.updateFocusSummary(focusResult);
       this.maybeNarrateEarthPhase(focusResult);
+
+      // 阶段切换时庆祝动效
+      const curPhaseKey = `${focusResult.star.key}-${focusResult.phase.key}`;
+      if (this.playing && curPhaseKey !== this.lastCelebPhaseKey && focusResult.idx > 0) {
+        this.lastCelebPhaseKey = curPhaseKey;
+        this.triggerCardPop(focusResult.star.key);
+        this.fireCelebration(["pisn","supernova","blackhole"].includes(focusResult.phase.special) ? "epic" : "normal");
+      }
+
+      // 阶段状态文字
+      if (this.phaseStatusText) {
+        this.phaseStatusText.textContent = focusResult.phase.name ? `当前阶段：${focusResult.phase.name}` : "";
+      }
+
       if (this.quizOpen) {
         this.renderQuiz(focusResult.star);
       }
@@ -971,6 +1246,9 @@ class StarUniverseApp {
     if (!focusResult || focusResult.star.key !== "earth" || !this.playing) {
       this.stopNarration();
     }
+
+    // 随机冷知识
+    this.maybeShowFunFact();
 
     if (this.progress >= MAX_PROGRESS && !this.endingShown && focusResult) {
       this.endingShown = true;

@@ -24,6 +24,7 @@
 const STAR_RED_DWARF = {
   key: "red-dwarf",
   name: "红矮星",
+  emoji: "🔴",
   massLabel: "0.09 M☉",
   massRatio: 0.09,
   themeColor: "#ff7a45",
@@ -156,6 +157,7 @@ const STAR_RED_DWARF = {
 // ============================================================
 const STAR_SUN = {
   key: "sun",
+  emoji: "☀️",
   name: "太阳型恒星",
   massLabel: "1.0 M☉",
   massRatio: 1.0,
@@ -319,6 +321,7 @@ const STAR_SUN = {
 // ============================================================
 const STAR_MASSIVE = {
   key: "massive",
+  emoji: "🔵",
   name: "大质量恒星",
   massLabel: "8 M☉",
   massRatio: 8,
@@ -490,7 +493,8 @@ const STAR_MASSIVE = {
 const EARTH = {
   key: "earth",
   name: "地球",
-  massLabel: "🌍 地球",
+  emoji: "🌍",
+  massLabel: "1.0 M⊕",
   massRatio: 1.0, // 1.0 M⊕ (Earth masses), consistent with other planets
   themeColor: "#4daaff",
   gradientFrom: "#4daaff",
@@ -647,6 +651,7 @@ const EARTH = {
 const PLANET_MERCURY = {
   key: "mercury",
   name: "水星",
+  emoji: "☿",
   massLabel: "0.055 M⊕",
   massRatio: 0.055,
   category: "planet",
@@ -719,6 +724,7 @@ const PLANET_MERCURY = {
 const PLANET_VENUS = {
   key: "venus",
   name: "金星",
+  emoji: "♀️",
   massLabel: "0.815 M⊕",
   massRatio: 0.815,
   category: "planet",
@@ -791,6 +797,7 @@ const PLANET_VENUS = {
 const PLANET_MARS = {
   key: "mars",
   name: "火星",
+  emoji: "♂️",
   massLabel: "0.107 M⊕",
   massRatio: 0.107,
   category: "planet",
@@ -878,6 +885,7 @@ const PLANET_MARS = {
 const PLANET_JUPITER = {
   key: "jupiter",
   name: "木星",
+  emoji: "🝾",
   massLabel: "317.8 M⊕",
   massRatio: 317.8,
   category: "planet",
@@ -950,6 +958,7 @@ const PLANET_JUPITER = {
 const PLANET_SATURN = {
   key: "saturn",
   name: "土星",
+  emoji: "🪐",
   massLabel: "95.2 M⊕",
   massRatio: 95.2,
   category: "planet",
@@ -1037,6 +1046,7 @@ const PLANET_SATURN = {
 const PLANET_URANUS = {
   key: "uranus",
   name: "天王星",
+  emoji: "⛢️",
   massLabel: "14.5 M⊕",
   massRatio: 14.5,
   category: "planet",
@@ -1109,6 +1119,7 @@ const PLANET_URANUS = {
 const PLANET_NEPTUNE = {
   key: "neptune",
   name: "海王星",
+  emoji: "♆️",
   massLabel: "17.1 M⊕",
   massRatio: 17.1,
   category: "planet",

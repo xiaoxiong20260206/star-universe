@@ -6,6 +6,7 @@
 const STAR_100M = {
   key: "black-hole",
   name: "超大质量恒星",
+  emoji: "🖤",
   massLabel: "100 M☉",
   massRatio: 100,
   category: "star",
@@ -175,6 +176,7 @@ const STAR_100M = {
 const STAR_250M = {
   key: "extreme",
   name: "极端大质量恒星",
+  emoji: "💥",
   massLabel: "250 M☉",
   massRatio: 250,
   themeColor: "#ff3366",
