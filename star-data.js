@@ -885,7 +885,7 @@ const PLANET_MARS = {
 const PLANET_JUPITER = {
   key: "jupiter",
   name: "木星",
-  emoji: "🝾",
+  emoji: "♃",
   massLabel: "317.8 M⊕",
   massRatio: 317.8,
   category: "planet",
