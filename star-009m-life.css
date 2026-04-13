@@ -26,6 +26,25 @@ body {
   padding: 28px 24px 36px;
 }
 
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(180, 205, 255, 0.2);
+  color: #a8c4f8;
+  font-size: 13px;
+  text-decoration: none;
+  transition: background 0.18s, color 0.18s;
+}
+.back-link:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #d6e8ff;
+}
+
 /* ======= HERO ======= */
 .hero { margin-bottom: 16px; }
 .hero-badge {
