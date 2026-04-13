@@ -508,6 +508,7 @@ class StarUniverseApp {
     this.badgeToastText = document.getElementById("badgeToastText");
     this.badgeShelf = document.getElementById("badgeShelf");
     this.badgeList = document.getElementById("badgeList");
+    this.helpBtn = document.getElementById("helpBtn");
     this.funFactCard = document.getElementById("funFactCard");
     this.funFactText = document.getElementById("funFactText");
   }
@@ -625,11 +626,14 @@ class StarUniverseApp {
 
   showBadgeToast(def) {
     if (!this.badgeToast) return;
+    // [fix] 清除残留 timer，防止多次快速触发时提前关闭
+    clearTimeout(this._badgeToastTimer);
     this.badgeToastEmoji.textContent = def.emoji;
     this.badgeToastText.textContent = `${def.title} — ${def.desc}`;
-    this.badgeToast.classList.remove("hidden");
+    this.badgeToast.classList.remove("hidden", "show");
+    void this.badgeToast.offsetWidth; // reflow 触发动画
     this.badgeToast.classList.add("show");
-    setTimeout(() => {
+    this._badgeToastTimer = setTimeout(() => {
       this.badgeToast.classList.remove("show");
       setTimeout(() => this.badgeToast.classList.add("hidden"), 400);
     }, 3000);
@@ -691,12 +695,19 @@ class StarUniverseApp {
     if (!this.timelineMarkers) return;
     const focusStar = this.getStar(this.focusKey);
     if (!focusStar) return;
+
+    // [fix] 节流：仅在 focusKey 或 phaseIdx 变化时重建 DOM
+    const curPhaseIdx = this.getCurrentPhaseIdx();
+    const cacheKey = `${this.focusKey}:${curPhaseIdx}`;
+    if (this._tlCacheKey === cacheKey) return;
+    this._tlCacheKey = cacheKey;
+
     const ranges = buildRanges(focusStar.phases);
     const markers = ranges.map((r, i) => {
       const pct = (r.start / MAX_PROGRESS) * 100;
       const phase = focusStar.phases[i];
-      const isCurrent = this.progress >= r.start && (i === ranges.length - 1 ? this.progress <= r.end : this.progress < r.end);
-      const isPast = r.end <= this.progress;
+      const isCurrent = i === curPhaseIdx;
+      const isPast = i < curPhaseIdx;
       return `<div class="tl-marker ${isCurrent ? "current" : ""} ${isPast ? "past" : ""}"
                    style="left:${pct}%"
                    title="${phase.name}">
@@ -1104,6 +1115,12 @@ class StarUniverseApp {
       this.endingShown = false;
       this.hideEnding();
       this.lastNarratedPhaseKey = null;
+      // [fix] 重置探索状态，避免重新开始时不触发成就/庆祝
+      this.exploredPhases = {};
+      this.lastCelebPhaseKey = null;
+      this.lastFunFactAt = 0;
+      this.lastPhaseIdx = -1;
+      this.phaseStartMs = Date.now();
       this.setPlaying(false);
       this.render();
     });
@@ -1175,12 +1192,24 @@ class StarUniverseApp {
       });
     }
 
+    // [feat] 帮助按钮：重新显示欢迎引导
+    if (this.helpBtn) {
+      this.helpBtn.addEventListener("click", () => {
+        if (this.welcomeOverlay) {
+          this.welcomeOverlay.classList.remove("hiding");
+          this.welcomeOverlay.classList.add("visible");
+        }
+      });
+    }
+
     window.addEventListener("resize", () => {
       this.renderStage();
       this.render();
     });
 
+    // [fix] 特效帧补帧：仅在非播放状态下维持高帧率特效（播放中已由 tick 驱动 render）
     setInterval(() => {
+      if (this.playing) return; // 播放中 tick() 已经定时 render，避免双重 render
       const focusCard = this.cards.get(this.focusKey);
       const phase = focusCard?.star.phases[getPhaseIndex(focusCard.ranges, this.progress)];
       if (!phase) return;

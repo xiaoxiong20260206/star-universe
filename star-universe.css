@@ -1496,6 +1496,16 @@ body {
   color: rgba(255,255,255,0.3);
   white-space: nowrap;
   transition: color 0.3s ease;
+  /* [fix] 窄屏默认隐藏标签，避免重叠 */
+  display: none;
+}
+
+/* 仅在宽屏且是当前/过去阶段时才显示标签 */
+@media (min-width: 640px) {
+  .tl-marker.current .tl-label,
+  .tl-marker.past .tl-label {
+    display: block;
+  }
 }
 
 .tl-marker.past .tl-dot {
