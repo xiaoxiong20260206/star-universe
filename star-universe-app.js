@@ -911,7 +911,7 @@ class StarUniverseApp {
     const focusObj = this.catalog.find(s => s.key === this.focusKey);
     if (!focusObj) return -1;
     const ranges = buildRanges(focusObj.phases);
-    return getPhaseIdx(ranges, this.progress);
+    return getPhaseIndex(ranges, this.progress);
   }
 
   tick() {
