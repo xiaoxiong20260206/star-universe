@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>30倍太阳质量恒星与行星的命运</title>
+  <link rel="stylesheet" href="star-30m-planet.css" />
+</head>
+<body>
+
+  <!-- ========== ENDING OVERLAY ========== -->
+  <div id="endingOverlay" class="ending-overlay">
+    <div class="ending-card">
+      <div class="ending-icon">⚫🪐</div>
+      <h2 class="ending-title">终章：黑洞 · 行星幸存</h2>
+      <p class="ending-subtitle">恒星已死，但行星依然在轨道上运行</p>
+      <div class="ending-body">
+        <p>
+          那颗蓝白色的巨星燃烧了 700 万年，最终在一声宇宙级别的爆炸中终结了自己的生命。<br/>
+          它变成了一个黑洞，把 15 个太阳的质量压缩进一个直径只有 90 公里的奇点里。
+        </p>
+        <p>
+          但 200 AU 之外的那颗行星——它活下来了。<br/>
+          超新星的冲击波剥蚀了它的大气层，恒星质量的骤减让它的轨道扩大到约 400 AU，<br/>
+          但它的岩石核心完好无损，继续在黑洞周围的轨道上漂行，
+          就像什么都没发生过一样，只是……没有了星光。
+        </p>
+        <div class="ending-compare">
+          <div class="ec-item">
+            <div class="ec-label">⭐ 30 M☉ 大质量恒星</div>
+            <div class="ec-val">寿命 <strong>约 700 万年</strong></div>
+            <div class="ec-val">超新星 → <strong>史瓦西黑洞</strong></div>
+            <div class="ec-result">⚫ 史瓦西半径 ~90 km</div>
+          </div>
+          <div class="ec-vs">VS</div>
+          <div class="ec-item planet">
+            <div class="ec-label">🪐 行星（200 AU 处）</div>
+            <div class="ec-val">遭受冲击波 <strong>大气剥蚀</strong></div>
+            <div class="ec-val">轨道扩大到 <strong>~400 AU</strong></div>
+            <div class="ec-result">✅ 引力束缚完好，继续存活</div>
+          </div>
+        </div>
+        <p class="ending-footnote">
+          📐 物理注释：超新星后恒星质量减半（30M☉→~15M☉），由开普勒第三定律，
+          行星轨道从 200 AU 扩大至约 400 AU（a_new = a_old × M_old/M_new）。
+          黑洞的潮汐瓦解半径仅约 10⁻⁶ AU，远小于 400 AU——行星绝不会被黑洞「吸入」。
+          此后行星将在黑洞引力束缚下运行数十亿年乃至万亿年。
+        </p>
+      </div>
+      <button id="endingClose" class="ending-btn">↺ 返回时间轴</button>
+    </div>
+  </div>
+
+  <main class="life-page">
+    <a href="index.html" class="back-link">← 返回宇宙探险站</a>
+
+    <header class="hero">
+      <p class="hero-badge">恒星演化可视化</p>
+      <h1>30 M☉ 大质量恒星与 200 AU 行星</h1>
+      <p class="hero-desc">
+        一颗 30 倍太阳质量的蓝白超巨星，与距它 200 AU 的行星——
+        恒星将在超新星爆炸中坍缩为黑洞，而行星因距离足够遥远，将在黑洞轨道上孤独存活。
+        拖动时间轴，观看 700 万年的宇宙剧情。
+      </p>
+      <div class="mode-toggles">
+        <button id="teachBtn" class="mode-btn active" title="开启教学模式，每阶段显示讲解字幕">
+          🎓 教学模式
+        </button>
+      </div>
+    </header>
+
+    <!-- Teaching caption bar -->
+    <div id="teachBar" class="teach-bar">
+      <div class="teach-icon" id="teachEmoji">🔭</div>
+      <div class="teach-text">
+        <strong id="teachTitle">分子云坍缩</strong>
+        <p id="teachCaption">
+          一团巨大的气体云在引力作用下迅速坍缩，这颗 30 倍太阳质量的恒星正在诞生。
+        </p>
+      </div>
+    </div>
+
+    <section class="sim-layout" id="simLayout">
+
+      <!-- ======== STAR + PLANET SCENES ======== -->
+      <div class="space-card">
+
+        <div class="scenes-row" id="scenesRow">
+
+          <!-- 恒星场景 -->
+          <div class="star-scene-wrap">
+            <div class="scene-label">⭐ 30 M☉ 大质量恒星</div>
+            <div class="space-scene" id="spaceScene">
+              <!-- Normal star visuals -->
+              <div class="star-halo" id="starHalo"></div>
+              <div class="star-core" id="starCore"></div>
+              <!-- Black hole visuals -->
+              <div class="gravitational-lens" id="gravLens" style="display:none"></div>
+              <div class="accretion-disk" id="accretionDisk" style="display:none"></div>
+              <div class="blackhole-core" id="blackholeCore" style="display:none"></div>
+              <!-- Effects -->
+              <div class="shockwave-ring" id="shockwaveRing"></div>
+              <div class="supernova-flash" id="supernovaFlash"></div>
+              <!-- Age tag -->
+              <div class="age-tag" id="ageTag">年龄：0</div>
+            </div>
+          </div>
+
+          <!-- 距离指示 -->
+          <div style="display:flex; align-items:center; flex-direction:column; justify-content:center; padding: 0 6px; flex-shrink:0;">
+            <div class="distance-bar" style="flex-direction:column; padding: 8px; min-width:60px; text-align:center;">
+              <div style="font-size:16px; margin-bottom:4px;">↔</div>
+              <div class="distance-label" style="font-size:11px; font-weight:700; color:#8ab0ff;">200 AU</div>
+              <div style="height:80px; width:1px; background: repeating-linear-gradient(to bottom, rgba(140,160,255,0.4) 0px, rgba(140,160,255,0.4) 4px, transparent 4px, transparent 9px); margin: 6px auto;"></div>
+              <div style="font-size:10px; color:rgba(140,160,255,0.5); line-height:1.4;">~300亿公里<br/>~2000天文单位</div>
+            </div>
+          </div>
+
+          <!-- 行星场景 -->
+          <div class="planet-scene-wrap">
+            <div class="scene-label planet-label">🪐 行星（200 AU）</div>
+            <div class="planet-space-scene" id="planetScene">
+              <div class="planet-orbit-ring" id="planetOrbit"></div>
+              <div class="planet-atmosphere" id="planetAtmo"></div>
+              <div class="planet-body" id="planetBody"></div>
+              <div class="planet-status-tag" id="planetStatusTag">稳定轨道</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Timeline -->
+        <div class="timeline-wrap">
+          <div class="timeline-header">
+            <h2 id="stageTitle">分子云坍缩</h2>
+            <span id="stageSpan">0 — 10 万年</span>
+          </div>
+          <input id="progress" type="range" min="0" max="1000" value="0" />
+          <div class="timeline-stops" id="timelineStops"></div>
+        </div>
+      </div>
+
+      <!-- ======== INFO PANEL ======== -->
+      <aside class="info-card">
+        <h3>实时参数</h3>
+        <ul class="metrics">
+          <li><span>恒星质量</span><strong>30 M☉</strong></li>
+          <li><span>年龄</span><strong id="metricAge">—</strong></li>
+          <li><span>光度</span><strong id="metricLum">—</strong></li>
+          <li><span>表面温度</span><strong id="metricTemp">—</strong></li>
+          <li><span>半径</span><strong id="metricRadius">—</strong></li>
+          <li><span>状态</span><strong id="metricState">—</strong></li>
+        </ul>
+
+        <!-- Planet status -->
+        <div class="planet-status-box">
+          <h4>🪐 行星状态</h4>
+          <div class="planet-status-indicator status-safe" id="planetIndicator">稳定轨道</div>
+          <p id="planetDetail">行星在 200 AU 的原行星盘中形成，距离恒星足够远，引力束缚稳定。</p>
+        </div>
+
+        <div class="stage-note">
+          <h4>阶段解读</h4>
+          <p id="stageNote">一团巨大的气体云在引力作用下急速坍缩，这颗 30 倍太阳质量的恒星正在诞生。</p>
+        </div>
+
+        <!-- 演化路径 -->
+        <div class="path-summary">
+          <h4>演化路径</h4>
+          <div class="path-steps">
+            <span>☁️ 云坍缩</span>
+            <span class="arrow">→</span>
+            <span>💙 蓝超巨星</span>
+            <span class="arrow">→</span>
+            <span>🔴 红超巨星</span>
+            <span class="arrow">→</span>
+            <span>💥 超新星</span>
+            <span class="arrow">→</span>
+            <span>⚫ 黑洞</span>
+          </div>
+          <p class="path-note">寿命仅 700 万年 · 行星在 200 AU 处存活</p>
+        </div>
+
+        <div class="controls">
+          <button id="playBtn">▶ 播放</button>
+          <button id="resetBtn" class="ghost">↺ 重置</button>
+          <label class="speed-select">
+            速度
+            <select id="speedSelect">
+              <option value="0.5">慢速</option>
+              <option value="1" selected>标准</option>
+              <option value="2">快速</option>
+              <option value="4">极快</option>
+            </select>
+          </label>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="footnote">
+      📚 科学注释：30 M☉ 大质量恒星寿命约 600–700 万年（约为太阳寿命的 1/1500），经历 OB 型主序星→红超巨星→II 型核坍缩超新星→史瓦西黑洞（质量约 15 M☉）的演化路径。
+      行星距恒星 200 AU（约为冥王星到太阳距离的 5 倍），超新星冲击波约 3 年后抵达，大气受到剥蚀，但引力束缚不被打破。
+      超新星后恒星质量减半，行星轨道由开普勒定律扩大至约 400 AU，持续绕黑洞运行。
+      黑洞潮汐瓦解半径（Roche limit）约 10⁻⁶ AU，远小于行星轨道，行星不会被吞噬。
+    </footer>
+  </main>
+
+  <script src="star-30m-planet.js"></script>
+</body>
+</html>
