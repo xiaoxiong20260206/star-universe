@@ -118,9 +118,6 @@ class StarWidget1K {
     `;
     const get = k => this.slot.querySelector(`[data-ref="${k}"]`);
     this.$ = {
-      halo, halo2, core, corona, surface, flare1, flare2, sn,
-      age, phaseBadge, pname, pspan, temp, lum, radius, note
-    } = {
       halo:       get("halo"),
       halo2:      get("halo2"),
       core:       get("core"),

@@ -376,6 +376,13 @@ body {
 .slot-name { font-size:13px; color:var(--sub); }
 .slot-fate { font-size:13px; font-weight:700; margin-left:auto; }
 
+/* ===== 容器 ===== */
+.sw-container, .planet-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
 /* ===== sw1k 恒星视觉元素 ===== */
 .sw1k-space {
   position:absolute; inset:0; border-radius:20px;
