@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1000 M☉ 千倍太阳质量恒星 · 不稳定对超新星 · 四光年外行星</title>
+  <link rel="stylesheet" href="star-1000m.css" />
+</head>
+<body>
+
+  <!-- PISN 闪光层 -->
+  <div id="pisnFlash" class="pisn-flash"></div>
+  <div id="snFlash" class="sn-flash-overlay"></div>
+
+  <!-- 结局弹层 -->
+  <div id="endingOverlay" class="ending-overlay">
+    <div class="ending-card">
+      <div class="ending-glow" style="background:radial-gradient(circle at 50% 30%, rgba(255,50,40,0.35), transparent 60%)"></div>
+      <p class="ending-pre">🎬 演化终章</p>
+      <h2 class="ending-title">终章</h2>
+      <p class="ending-desc"></p>
+      <div class="ending-badge" style="font-size:28px;margin:12px 0"></div>
+      <p class="ending-note hidden" id="endingNote"></p>
+      <div class="ending-facts">
+        <div class="ef-item">⚡ 1000 M☉ PISN 能量：250 M☉ PISN 的 4 倍</div>
+        <div class="ef-item">🌌 亮度：比整个银河系亮 100 倍</div>
+        <div class="ef-item">🔬 残骸：零——完全湮灭，不留黑洞</div>
+        <div class="ef-item">🪐 4光年外行星：大气剥蚀但岩石核心完好</div>
+        <div class="ef-item">🌱 遗产：海量重元素播撒数十光年空间</div>
+      </div>
+      <button id="endingClose" class="ending-btn" style="background:linear-gradient(135deg,#cc2040,#ff2255)">↺ 继续探索</button>
+    </div>
+  </div>
+
+  <main class="app-page">
+
+    <!-- HERO -->
+    <header class="hero-1k">
+      <div class="hero-badge-1k">🔴 千倍太阳质量恒星 · 1000 M☉ + 🪐 四光年外行星</div>
+      <h1>最壮烈的死亡<br/>不稳定对超新星</h1>
+      <p class="sub">
+        质量是太阳 <strong>1000 倍</strong>，只活 <strong>220 万年</strong>。<br/>
+        四光年外有一颗行星，目睹了这场宇宙级灾难——<br/>
+        恒星以<strong>不稳定对超新星（PISN）</strong>完全湮灭，行星幸存但永远失去了它的光。
+      </p>
+    </header>
+
+    <!-- 警告框 -->
+    <div class="warn-box">
+      <span class="wi">⚡</span>
+      <span>
+        <strong>1000 M☉ 是极端假设质量。</strong>
+        目前观测到的最大恒星约 250-300 M☉（R136a1）。
+        但宇宙早期（Population III）可能存在 500-1000 M☉ 的巨星。
+        <br/>对不稳定质量窗口 140-260 M☉：1000 M☉ 在极端恒星风减重后，核心可能落入 PISN 区间，
+        或者先经历<strong>脉冲对不稳定（PPISN）</strong>多次预爆后再最终 PISN 湮灭。
+      </span>
+    </div>
+
+    <!-- 科学参数卡片 -->
+    <div class="science-cards">
+      <div class="sci-card">
+        <div class="sci-icon">⚖️</div>
+        <div class="sci-title">恒星质量</div>
+        <div class="sci-value">1000 M☉</div>
+        <div class="sci-note">相当于 100 万个地球</div>
+      </div>
+      <div class="sci-card">
+        <div class="sci-icon">⏳</div>
+        <div class="sci-title">恒星寿命</div>
+        <div class="sci-value">~220 万年</div>
+        <div class="sci-note">比太阳寿命短 4500 倍</div>
+      </div>
+      <div class="sci-card">
+        <div class="sci-icon">💡</div>
+        <div class="sci-title">最高光度</div>
+        <div class="sci-value">3000 万 L☉</div>
+        <div class="sci-note">PISN 爆炸峰值 5×10¹¹ L☉</div>
+      </div>
+      <div class="sci-card">
+        <div class="sci-icon">🔥</div>
+        <div class="sci-title">表面温度</div>
+        <div class="sci-value">62,000 K</div>
+        <div class="sci-note">太阳表面温度的 11 倍</div>
+      </div>
+      <div class="sci-card">
+        <div class="sci-icon">🪐</div>
+        <div class="sci-title">行星距离</div>
+        <div class="sci-value">4 光年</div>
+        <div class="sci-note">≈ 252,000 AU ≈ 比邻星距离</div>
+      </div>
+      <div class="sci-card">
+        <div class="sci-icon">💣</div>
+        <div class="sci-title">爆炸能量</div>
+        <div class="sci-value">4× 250M☉ PISN</div>
+        <div class="sci-note">比整个银河系亮100倍</div>
+      </div>
+    </div>
+
+    <!-- 演化路径时间轴 -->
+    <div class="pisn-path-section">
+      <div class="pisn-path-title">📍 演化路径总览</div>
+      <div class="pisn-path-timeline">
+        <div class="ppt-step"><div class="ppt-icon">☁️</div><div class="ppt-name">分子云</div><div class="ppt-age">8千年</div></div>
+        <div class="ppt-step"><div class="ppt-icon">⚡</div><div class="ppt-name">极端原恒星</div><div class="ppt-age">4万年</div></div>
+        <div class="ppt-step"><div class="ppt-icon">🔥</div><div class="ppt-name">ZAMS</div><div class="ppt-age">15万年</div></div>
+        <div class="ppt-step"><div class="ppt-icon">💙</div><div class="ppt-name">极超巨星</div><div class="ppt-age">100万年</div></div>
+        <div class="ppt-step"><div class="ppt-icon">🌪️</div><div class="ppt-name">LBV</div><div class="ppt-age">160万年</div></div>
+        <div class="ppt-step"><div class="ppt-icon">☄️</div><div class="ppt-name">WR星</div><div class="ppt-age">200万年</div></div>
+        <div class="ppt-step highlight"><div class="ppt-icon">⚠️</div><div class="ppt-name">PPISN脉冲</div><div class="ppt-age">215万年</div></div>
+        <div class="ppt-step highlight"><div class="ppt-icon">💥</div><div class="ppt-name">PISN爆炸</div><div class="ppt-age">220万年</div></div>
+        <div class="ppt-step"><div class="ppt-icon">🌈</div><div class="ppt-name">遗迹星云</div><div class="ppt-age">永久扩散</div></div>
+      </div>
+    </div>
+
+    <!-- 控制栏 -->
+    <div class="control-bar">
+      <button id="playBtn" class="ctrl-btn primary">▶ 播放</button>
+      <button id="resetBtn" class="ctrl-btn ghost">↺ 重置</button>
+      <label class="ctrl-label">
+        速度
+        <select id="speedSelect" class="ctrl-select">
+          <option value="0.4">慢速</option>
+          <option value="1" selected>标准</option>
+          <option value="2">快速</option>
+          <option value="4">极速</option>
+        </select>
+      </label>
+      <button id="teachToggle" class="ctrl-btn mode active">🎓 教学解说</button>
+      <button id="quizToggle"  class="ctrl-btn mode">🧩 趣味问答</button>
+    </div>
+
+    <!-- 进度条 -->
+    <div class="progress-section">
+      <div class="progress-track" id="progressTrack">
+        <div class="progress-rail">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-thumb" id="progressThumb"></div>
+        <input type="range" id="progressBar" min="0" max="1000" value="0" class="progress-input" />
+        <div class="milestone-bar" id="milestoneBar"></div>
+      </div>
+      <div class="stage-label" id="stageLabel">进度 0% · 分子云坍缩</div>
+    </div>
+
+    <!-- 教学解说栏 -->
+    <div id="teachBar" class="teach-bar">
+      <div class="teach-emoji" id="teachEmoji">🌌</div>
+      <div class="teach-content">
+        <strong id="teachTitle">千倍太阳质量恒星的诞生</strong>
+        <p id="teachCaption">点击播放，见证宇宙中最极端的恒星演化！四光年外的行星将目睹这一切。</p>
+      </div>
+    </div>
+
+    <!-- 双场景展示区 -->
+    <div class="dual-scene-section">
+      <!-- 恒星展示 -->
+      <div class="scene-column star-column">
+        <div class="scene-label-bar">⭐ 1000 M☉ 千倍太阳质量恒星</div>
+        <div class="stars-grid" id="starsGrid"></div>
+      </div>
+
+      <!-- 距离指示 -->
+      <div class="distance-indicator">
+        <div class="dist-icon">↔</div>
+        <div class="dist-value">4 光年</div>
+        <div class="dist-line"></div>
+        <div class="dist-sub">≈ 252,000 AU<br/>≈ 3.78×10¹⁶ 米<br/>≈ 比邻星距离</div>
+        <div class="dist-note">冲击波约4年后抵达行星</div>
+      </div>
+
+      <!-- 行星展示 -->
+      <div class="scene-column planet-column">
+        <div class="scene-label-bar planet-label">🪐 四光年外行星（2 M⊕）</div>
+        <div class="planet-grid" id="planetGrid"></div>
+      </div>
+    </div>
+
+    <!-- 问答面板 -->
+    <section class="quiz-section hidden" id="quizPanel">
+      <div id="quizSection"></div>
+    </section>
+
+    <footer class="app-footer">
+      📚 不稳定对超新星（PISN）适用于核心质量 140-260 M☉ 的恒星。1000 M☉ 恒星在极端恒星风减重后可能经历 PPISN + PISN。<br/>
+      宇宙第一代恒星（Population III）可能大量经历 PISN，是早期宇宙重元素的主要来源。<br/>
+      4光年 ≈ 比邻星距离；PISN冲击波传播速度约3万km/s，约4年后抵达4光年处。
+    </footer>
+
+  </main>
+
+  <script src="star-1000m-data.js"></script>
+  <script src="star-1000m-engine.js"></script>
+</body>
+</html>
