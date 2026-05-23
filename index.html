@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>宇宙探险站 · 太阳系八大行星同屏演化</title>
-  <meta name="description" content="带孩子探索太阳系八大行星的一生！用有趣的动画和讲解，看行星从诞生到终局的完整演化。" />
+  <title>宇宙探险站 · 恒星与行星演化全集</title>
+  <meta name="description" content="探索恒星与行星的一生！从红矮星到千倍太阳质量恒星，从行星诞生到超新星爆发，各种极端天体演化场景。" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="stylesheet" href="star-universe.css" />
 </head>
@@ -25,76 +25,102 @@
   <!-- 庆祝粒子层 -->
   <canvas id="celebCanvas" class="celeb-canvas"></canvas>
 
-  <!-- 欢迎引导弹层 -->
-  <div id="welcomeOverlay" class="welcome-overlay">
-    <div class="welcome-card">
-      <div class="welcome-planets-row">
-        <span class="wp-planet" style="animation-delay:0s">🌍</span>
-        <span class="wp-planet" style="animation-delay:0.1s">🪐</span>
-        <span class="wp-planet" style="animation-delay:0.2s">⭐</span>
-        <span class="wp-planet" style="animation-delay:0.3s">🔴</span>
-        <span class="wp-planet" style="animation-delay:0.4s">🟠</span>
-        <span class="wp-planet" style="animation-delay:0.5s">🧊</span>
-        <span class="wp-planet" style="animation-delay:0.6s">💙</span>
-        <span class="wp-planet" style="animation-delay:0.7s">☿</span>
-      </div>
-      <h2 class="welcome-title">🚀 宇宙探险开始！</h2>
-      <p class="welcome-desc">欢迎来到太阳系！这里有八颗行星，每颗都有自己独特的一生。<br/>你来当宇宙探险家，看看它们从诞生到终局的故事吧！</p>
-      <div class="welcome-steps">
-        <div class="ws-step"><span class="ws-num">①</span> <span>点击下方<strong>行星卡片</strong>选择要探索的行星</span></div>
-        <div class="ws-step"><span class="ws-num">②</span> <span>点击 <strong>🚀 开始探索</strong> 按钮播放演化</span></div>
-        <div class="ws-step"><span class="ws-num">③</span> <span>探索完一颗行星可以解锁<strong>成就徽章</strong>🏆</span></div>
-      </div>
-      <button id="welcomeStart" class="welcome-btn">✨ 出发！</button>
-    </div>
-  </div>
-
-  <!-- 终章弹层 -->
-  <div id="endingOverlay" class="ending-overlay">
-    <div class="ending-card">
-      <div class="ending-glow"></div>
-      <p class="ending-pre">🎬 演化终章</p>
-      <h2 id="endingTitle" class="ending-title">终章</h2>
-      <p id="endingDesc" class="ending-desc"></p>
-      <div id="endingBadge" class="ending-badge"></div>
-      <p id="endingNote" class="ending-note"></p>
-      <button id="endingClose" class="ending-btn">🔄 继续探索</button>
-    </div>
-  </div>
-
-  <!-- 成就徽章弹出提示 -->
-  <div id="badgeToast" class="badge-toast hidden">
-    <div class="badge-toast-inner">
-      <div id="badgeToastEmoji" class="bte-emoji">🏆</div>
-      <div>
-        <div class="bte-title">解锁成就！</div>
-        <div id="badgeToastText" class="bte-text">探索完成</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 冷知识卡片 -->
-  <div id="funFactCard" class="funfact-card hidden">
-    <div class="ff-emoji">💡</div>
-    <div id="funFactText" class="ff-text"></div>
-  </div>
-
   <main class="page-shell one-screen-layout">
     <!-- Hero 区 -->
     <header class="hero glass-panel compact-hero">
       <div class="hero-copy">
         <div class="hero-badge">🚀 宇宙探险站 · STAR UNIVERSE</div>
-        <h1>太阳系八大行星，同屏演化</h1>
+        <h1>恒星与行星演化全集</h1>
         <p>
-          探索<strong>水星、金星、地球、火星、木星、土星、天王星、海王星</strong>从诞生到终局的完整旅程。用统一比例尺看清它们有多不一样！
+          从<strong>红矮星</strong>到<strong>千倍太阳质量恒星</strong>，<br/>
+          从<strong>行星诞生</strong>到<strong>超新星爆发</strong>——探索宇宙中天体的一生！
         </p>
       </div>
       <div class="hero-stats">
-        <div class="hero-stat"><span>最小行星</span><strong>☿ 水星</strong><em>0.055 M⊕ · 命运：被太阳吞噬</em></div>
-        <div class="hero-stat"><span>最大行星</span><strong>🪐 木星</strong><em>317.8 M⊕ · 命运：可能存活</em></div>
-        <div class="hero-stat"><span>最远行星</span><strong>🔵 海王星</strong><em>30 AU · 命运：几乎必存活</em></div>
+        <div class="hero-stat"><span>最小恒星</span><strong>🔴 红矮星</strong><em>0.09 M☉ · 寿命3万亿年</em></div>
+        <div class="hero-stat"><span>最大恒星</span><strong>💥 千倍质量</strong><em>1000 M☉ · PISN湮灭</em></div>
+        <div class="hero-stat"><span>最壮观</span><strong>⚡ 超新星</strong><em>250 M☉ · 亮度超银河系</em></div>
       </div>
     </header>
+
+    <!-- 探索入口网格 -->
+    <section class="selector-wrap glass-panel">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">🌟 选择探索场景</p>
+          <h2>点击进入任意演化场景</h2>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-top:20px;">
+        
+        <!-- 入口1: 太阳系八大行星 -->
+        <a href="#stageGrid" class="portal-card" onclick="document.getElementById('stageGrid').scrollIntoView({behavior:'smooth'}); return false;">
+          <div class="pc-icon">🌍🪐⭐🔴🟠🧊💙☿</div>
+          <div class="pc-title">太阳系八大行星</div>
+          <div class="pc-desc">八颗行星同屏演化，对比它们从诞生到终局的完整旅程</div>
+          <div class="pc-tags">
+            <span class="pc-tag">0.0003-318 M⊕</span>
+            <span class="pc-tag">岩石/气态</span>
+          </div>
+        </a>
+
+        <!-- 入口2: 红矮星 -->
+        <a href="star-009m-life.html" class="portal-card" style="--c:#ff4466;">
+          <div class="pc-icon">🔴</div>
+          <div class="pc-title">红矮星的一生</div>
+          <div class="pc-desc">0.09倍太阳质量，宇宙最长寿的恒星，能活3万亿年！</div>
+          <div class="pc-tags">
+            <span class="pc-tag">0.09 M☉</span>
+            <span class="pc-tag">→ 黑矮星</span>
+          </div>
+        </a>
+
+        <!-- 入口3: 30M☉ 恒星+行星 -->
+        <a href="star-30m-planet.html" class="portal-card" style="--c:#6644ff;">
+          <div class="pc-icon">⚫🪐</div>
+          <div class="pc-title">大质量恒星与行星</div>
+          <div class="pc-desc">30倍太阳质量恒星坍缩成黑洞，四光年外的行星能否幸存？</div>
+          <div class="pc-tags">
+            <span class="pc-tag">30 M☉</span>
+            <span class="pc-tag">→ 黑洞</span>
+          </div>
+        </a>
+
+        <!-- 入口4: 250M☉ PISN -->
+        <a href="star-250m.html" class="portal-card" style="--c:#ffaa22;">
+          <div class="pc-icon">💥</div>
+          <div class="pc-title">不稳定对超新星</div>
+          <div class="pc-desc">250倍太阳质量，完全湮灭不留残骸，宇宙最壮观的死亡！</div>
+          <div class="pc-tags">
+            <span class="pc-tag">250 M☉</span>
+            <span class="pc-tag">PISN</span>
+          </div>
+        </a>
+
+        <!-- 入口5: 1000M☉ PISN+行星 -->
+        <a href="star-1000m.html" class="portal-card" style="--c:#ff2244;">
+          <div class="pc-icon">🔥🪐</div>
+          <div class="pc-title">千倍质量恒星 + 行星</div>
+          <div class="pc-desc">1000倍太阳质量，极端PISN！四光年外行星目睹全程，4年后冲击波抵达</div>
+          <div class="pc-tags">
+            <span class="pc-tag">1000 M☉</span>
+            <span class="pc-tag">PPISN+PISN</span>
+          </div>
+        </a>
+
+        <!-- 入口6: 恒星对比 -->
+        <a href="star-compare.html" class="portal-card" style="--c:#44aaff;">
+          <div class="pc-icon">☀️⚡💥</div>
+          <div class="pc-title">恒星命运对比</div>
+          <div class="pc-desc">一张图看懂：不同质量的恒星最终都去哪儿？</div>
+          <div class="pc-tags">
+            <span class="pc-tag">0.09-8 M☉</span>
+            <span class="pc-tag">多结局</span>
+          </div>
+        </a>
+
+      </div>
+    </section>
 
     <!-- 成就徽章展示区 -->
     <section id="badgeShelf" class="badge-shelf glass-panel hidden">
@@ -191,12 +217,6 @@
 
     <footer class="footer-note">
       数据为天体物理近似演示模型，适合科普学习。质量决定天体命运——<strong>这是宇宙最深刻的规律之一。</strong>
-      <div style="margin-top:12px; display:flex; flex-wrap:wrap; gap:10px;">
-        <a href="star-009m-life.html" class="page-link">🔴 红矮星独立演化页（0.09 M☉ 详细版）→</a>
-        <a href="star-30m-planet.html" class="page-link">⚫ 大质量恒星与行星（30 M☉ → 黑洞，行星幸存）→</a>
-        <a href="star-250m.html" class="page-link">💥 不稳定对超新星（250 M☉ PISN 详细版）→</a>
-        <a href="star-1000m.html" class="page-link">🔥 千倍太阳质量恒星（1000 M☉ PISN + 四光年外行星）→</a>
-      </div>
     </footer>
   </main>
 
